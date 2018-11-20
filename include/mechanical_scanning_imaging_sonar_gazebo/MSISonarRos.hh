@@ -19,12 +19,12 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 
-// FLSonar Dependencies
-#include "foward_looking_gazebo_sonar/FLSonar.hh"
+// MSISonar Dependencies
+#include "mechanical_scanning_imaging_sonar_gazebo/MSISonar.hh"
 
 namespace gazebo
 {
-class FLSonarRos : public SensorPlugin
+class MSISonarRos : public SensorPlugin
 {
 public:
   /**
@@ -67,7 +67,7 @@ public:
   physics::LinkPtr current;
 
   //// \brief sonar sensor where the link link is attached to
-  std::shared_ptr<gazebo::rendering::FLSonar> sonar;
+  std::shared_ptr<gazebo::rendering::MSISonar> sonar;
 
 private:
   // Pointer to the model
@@ -101,5 +101,5 @@ private:
 };
 
 // Register this plugin with the simulator
-GZ_REGISTER_SENSOR_PLUGIN(FLSonarRos)
+GZ_REGISTER_SENSOR_PLUGIN(MSISonarRos)
 }  // namespace gazebo

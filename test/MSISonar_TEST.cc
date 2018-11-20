@@ -9,7 +9,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/common/MeshManager.hh"
 
-#include <mechanical_scanning_imaging_sonar_gazebo/FLSonar.hh>
+#include <mechanical_scanning_imaging_sonar_gazebo/MSISonar.hh>
 
 // OpenCV includes
 #include <opencv2/opencv.hpp>
@@ -221,15 +221,15 @@ TEST_F(Sonar_TEST, Create)
       << "</plugin>"
       << "</sdf>";
 
-  sdf::ElementPtr FLSonarSDF(new sdf::Element);
-  sdf::initFile("plugin.sdf", FLSonarSDF);
-  sdf::readString(newSonarSS.str(), FLSonarSDF);
+  sdf::ElementPtr MSISonarSDF(new sdf::Element);
+  sdf::initFile("plugin.sdf", MSISonarSDF);
+  sdf::readString(newSonarSS.str(), MSISonarSDF);
 
   gzwarn << PROJECT_SOURCE_PATH << std::endl;
 
-  rendering::FLSonar *flSonar = new rendering::FLSonar("test_sonar",scene,false);
+  rendering::MSISonar *flSonar = new rendering::MSISonar("test_sonar",scene,false);
   flSonar->Init();
-  flSonar->Load(FLSonarSDF);
+  flSonar->Load(MSISonarSDF);
 
   ASSERT_EQ(0.3,flSonar->GetFarClip());
   
@@ -294,13 +294,13 @@ TEST_F(Sonar_TEST, SphereDraw)
       << "</plugin>"
       << "</sdf>";
 
-  sdf::ElementPtr FLSonarSDF(new sdf::Element);
-  sdf::initFile("plugin.sdf", FLSonarSDF);
-  sdf::readString(newSonarSS.str(), FLSonarSDF);
+  sdf::ElementPtr MSISonarSDF(new sdf::Element);
+  sdf::initFile("plugin.sdf", MSISonarSDF);
+  sdf::readString(newSonarSS.str(), MSISonarSDF);
 
-  rendering::FLSonar *flSonar = new rendering::FLSonar("test_sonar",scene,false);
+  rendering::MSISonar *flSonar = new rendering::MSISonar("test_sonar",scene,false);
   flSonar->Init();
-  flSonar->Load(FLSonarSDF);
+  flSonar->Load(MSISonarSDF);
   gzwarn << "Image Width " << flSonar->ImageWidth() << std::endl;
   flSonar->CreateTexture("GPUTexture");
 
@@ -382,13 +382,13 @@ TEST_F(Sonar_TEST, ConeDraw)
       << "</plugin>"
       << "</sdf>";
 
-  sdf::ElementPtr FLSonarSDF(new sdf::Element);
-  sdf::initFile("plugin.sdf", FLSonarSDF);
-  sdf::readString(newSonarSS.str(), FLSonarSDF);
+  sdf::ElementPtr MSISonarSDF(new sdf::Element);
+  sdf::initFile("plugin.sdf", MSISonarSDF);
+  sdf::readString(newSonarSS.str(), MSISonarSDF);
 
-  rendering::FLSonar *flSonar = new rendering::FLSonar("test_sonar",scene,false);
+  rendering::MSISonar *flSonar = new rendering::MSISonar("test_sonar",scene,false);
   flSonar->Init();
-  flSonar->Load(FLSonarSDF);
+  flSonar->Load(MSISonarSDF);
   gzwarn << "Image Width " << flSonar->ImageWidth() << std::endl;
   flSonar->CreateTexture("GPUTexture");
 

@@ -43,7 +43,7 @@ namespace rendering
 
 /// \class Sonar Sonar.hh rendering/rendering.hh
 /// \brief GPU based laser distance sensor
-class GZ_RENDERING_VISIBLE FLSonar
+class GZ_RENDERING_VISIBLE MSISonar
   : public Camera, public Ogre::RenderObjectListener
 {
   /// \brief Constructor
@@ -51,12 +51,12 @@ class GZ_RENDERING_VISIBLE FLSonar
   /// \param[in] _scene Scene that will contain the camera
   /// \param[in] _autoRender Almost everyone should leave this as true.
 public:
-  FLSonar(const std::string &_namePrefix,
+  MSISonar(const std::string &_namePrefix,
           ScenePtr _scene, const bool _autoRender = true);
 
   /// \brief Destructor
 public:
-  virtual ~FLSonar();
+  virtual ~MSISonar();
 
   // Documentation inherited
 public:

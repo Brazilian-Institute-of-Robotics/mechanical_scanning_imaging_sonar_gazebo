@@ -1,6 +1,6 @@
 // Copyright 2018 mccr_gazebo"
 
-#include "mechanical_scanning_imaging_sonar_gazebo/MSISSonarRos.hh"
+#include "mechanical_scanning_imaging_sonar_gazebo/MSISonarRos.hh"
 
 #include "mechanical_scanning_imaging_sonar_gazebo/SDFTool.hh"
 
@@ -10,17 +10,17 @@
 namespace gazebo
 {
 
-void MSISSonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
+void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 {
   // Store the pointer to the model
   this->sensor = _parent;
 
   this->updateConnection =  event::Events::ConnectRender(
-                              std::bind(&MSISSonarRos::OnUpdate, this));
+                              std::bind(&MSISonarRos::OnUpdate, this));
   this->updatePostRender =  event::Events::ConnectPostRender(
-                              std::bind(&MSISSonarRos::OnPostRender, this));
+                              std::bind(&MSISonarRos::OnPostRender, this));
   this->updatePreRender =  event::Events::ConnectPreRender(
-                             std::bind(&MSISSonarRos::OnPreRender, this));
+                             std::bind(&MSISonarRos::OnPreRender, this));
 
 
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -56,7 +56,7 @@ void MSISSonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   {
     gzwarn << "Got Scene" << std::endl;
     double hfov = M_PI / 2;
-    this->sonar = std::shared_ptr<rendering::MSISSonar>(new rendering::MSISSonar(this->sensor->Name(), this->scene, false));
+    this->sonar = std::shared_ptr<rendering::MSISonar>(new rendering::MSISonar(this->sensor->Name(), this->scene, false));
     this->sonar->SetFarClip(100.0);
     this->sonar->Init();
     this->sonar->Load(_sdf);
@@ -92,13 +92,13 @@ void MSISSonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
 
 
-void MSISSonarRos::OnPreRender()
+void MSISonarRos::OnPreRender()
 {
   this->sonar->PreRender(current->GetWorldCoGPose());
   this->sonar->GetSonarImage();
 }
 
-void MSISSonarRos::OnUpdate()
+void MSISonarRos::OnUpdate()
 {
   if (this->bDebug)
     gzwarn << this->sensor->ParentName() << std::endl;
@@ -107,7 +107,7 @@ void MSISSonarRos::OnUpdate()
 }
 
 
-void MSISSonarRos::OnPostRender()
+void MSISonarRos::OnPostRender()
 {
   this->sonar->PostRender();
 
