@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(foward_looking_gazebo_sonar)
+project(mechanical_scanning_imagery_sonar)
 
 
 find_package(catkin REQUIRED COMPONENTS roslint
@@ -10,7 +10,7 @@ find_package(OpenCV REQUIRED)
 find_package(GAZEBO REQUIRED)
 find_package(Boost REQUIRED)
 
-set(FOWARD_LOOKING_GAZEBO_SONAR "")
+set(MECHANICAL_SCANNING_IMAGERY_SONAR "")
 
 catkin_package(
   INCLUDE_DIRS include
@@ -34,30 +34,30 @@ include_directories(
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 set(ROSLINT_CPP_OPTS "--extensions=hpp,cpp,c,hh,cc,h")
 
-set(FOWARD_LOOKING_GAZEBO_SONAR_SRCS
-  src/FLSonar.cc
-  src/FLSonarRos.cc)
+set(MECHANICAL_SCANNING_IMAGERY_SONAR_SRCS
+  src/MSISSonar.cc
+  src/MSISSonarRos.cc)
 
-set(FOWARD_LOOKING_GAZEBO_SONAR_HEADERS
- include/${PROJECT_NAME}/FLSonar.hh
- include/${PROJECT_NAME}/FLSonarRos.hh
+set(MECHANICAL_SCANNING_IMAGERY_SONAR_HEADERS
+ include/${PROJECT_NAME}/MSISSonar.hh
+ include/${PROJECT_NAME}/MSISSonarRos.hh
  include/${PROJECT_NAME}/SDFTool.hh)
 
 roslint_cpp()
 
-roslint_cpp(${FOWARD_LOOKING_GAZEBO_SONAR_SRCS}
-  ${FOWARD_LOOKING_GAZEBO_SONAR_HEADERS})
+roslint_cpp(${MECHANICAL_SCANNING_IMAGERY_SONAR_SRCS}
+  ${MECHANICAL_SCANNING_IMAGERY_SONAR_HEADERS})
 
-add_library(FLSonar src/FLSonar.cc)
-target_link_libraries(FLSonar ${GAZEBO_LIBRARIES} ${OpenCV_LIBRARIES} ${FOWARD_LOOKING_GAZEBO_SONAR_LIST})
-list(APPEND FOWARD_LOOKING_GAZEBO_SONAR_LIST FLSonar)
+add_library(MSISSonar src/MSISSonar.cc)
+target_link_libraries(MSISSonar ${GAZEBO_LIBRARIES} ${OpenCV_LIBRARIES} ${MECHANICAL_SCANNING_IMAGERY_SONAR_LIST})
+list(APPEND MECHANICAL_SCANNING_IMAGERY_SONAR_LIST MSISSonar)
 
-add_library(FowardLookingGazeboSonar src/FLSonarRos.cc)
-target_link_libraries(FowardLookingGazeboSonar ${catkin_LIBRARIES} ${FOWARD_LOOKING_GAZEBO_SONAR_LIST})
-add_dependencies(FowardLookingGazeboSonar ${catkin_EXPORTED_TARGETS})
-list(APPEND FOWARD_LOOKING_GAZEBO_SONAR_LIST FowardLookingGazeboSonar)
+add_library(MechanicalScaningImagingSonarGazebo src/MSISSonarRos.cc)
+target_link_libraries(MechanicalScaningImagingSonarGazebo ${catkin_LIBRARIES} ${MECHANICAL_SCANNING_IMAGERY_SONAR_LIST})
+add_dependencies(MechanicalScaningImagingSonarGazebo ${catkin_EXPORTED_TARGETS})
+list(APPEND MECHANICAL_SCANNING_IMAGERY_SONAR_LIST MechanicalScaningImagingSonar)
 
-install(TARGETS ${FOWARD_LOOKING_GAZEBO_SONAR_LIST} ${FOWARD_LOOKING_GAZEBO_SONAR_LIST}
+install(TARGETS ${MECHANICAL_SCANNING_IMAGERY_SONAR_LIST} ${MECHANICAL_SCANNING_IMAGERY_SONAR_LIST}
   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -87,10 +87,10 @@ if (CATKIN_ENABLE_TESTING)
   add_library(gazebo_test_fixture EXCLUDE_FROM_ALL test/ServerFixture.cc)
   target_link_libraries(gazebo_test_fixture ${GAZEBO_LIBRARIES})
 
-  add_rostest_gtest(FLSonar_TEST test/pure_gazebo_test.test test/FLSonar_TEST.cc)
-  target_link_libraries(FLSonar_TEST gazebo_test_fixture ${GAZEBO_LIBRARIES} gtest ${OpenCV_LIBRARIES} ${FOWARD_LOOKING_GAZEBO_SONAR_LIST})
+  add_rostest_gtest(MSISSonar_TEST test/pure_gazebo_test.test test/MSISSonar_TEST.cc)
+  target_link_libraries(MSISSonar_TEST gazebo_test_fixture ${GAZEBO_LIBRARIES} gtest ${OpenCV_LIBRARIES} ${MECHANICAL_SCANNING_IMAGERY_SONAR_LIST})
   #Add Media Path
-  set_target_properties(FLSonar_TEST PROPERTIES COMPILE_DEFINITIONS "OGRE_MEDIA_PATH=\"${PROJECT_SOURCE_DIR}/media\"")
+  set_target_properties(MSISSonar_TEST PROPERTIES COMPILE_DEFINITIONS "OGRE_MEDIA_PATH=\"${PROJECT_SOURCE_DIR}/media\"")
 
   roslint_add_test()
 endif()

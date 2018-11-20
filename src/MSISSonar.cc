@@ -28,8 +28,8 @@
 #include "gazebo/rendering/Visual.hh"
 #include "gazebo/rendering/Conversions.hh"
 #include "gazebo/rendering/Scene.hh"
-#include "foward_looking_gazebo_sonar/FLSonar.hh"
-#include "foward_looking_gazebo_sonar/SDFTool.hh"
+#include "mechanical_scanning_imaging_sonar_gazebo/MSISSonar.hh"
+#include "mechanical_scanning_imaging_sonar_gazebo/SDFTool.hh"
 
 namespace gazebo
 {
@@ -39,7 +39,7 @@ namespace rendering
 
 
 //////////////////////////////////////////////////
-FLSonar::FLSonar(const std::string &_namePrefix, ScenePtr _scene,
+MSISSonar::MSISSonar(const std::string &_namePrefix, ScenePtr _scene,
                  const bool _autoRender)
   : Camera(_namePrefix, _scene, false),
     imageWidth(0),
@@ -50,14 +50,14 @@ FLSonar::FLSonar(const std::string &_namePrefix, ScenePtr _scene,
 }
 
 //////////////////////////////////////////////////
-FLSonar::~FLSonar()
+MSISSonar::~MSISSonar()
 {
   Ogre::TextureManager::getSingleton().remove(
     this->camTexture->getName());
 }
 
 //////////////////////////////////////////////////
-void FLSonar::Load(sdf::ElementPtr _sdf)
+void MSISSonar::Load(sdf::ElementPtr _sdf)
 {
   Camera::Load(_sdf);
 
@@ -83,25 +83,25 @@ void FLSonar::Load(sdf::ElementPtr _sdf)
 }
 
 //////////////////////////////////////////////////
-void FLSonar::Load()
+void MSISSonar::Load()
 {
   Camera::Load();
 }
 
 //////////////////////////////////////////////////
-void FLSonar::Init()
+void MSISSonar::Init()
 {
   Camera::Init();
 }
 
 //////////////////////////////////////////////////
-void FLSonar::Fini()
+void MSISSonar::Fini()
 {
   Camera::Fini();
 }
 
 //////////////////////////////////////////////////
-void FLSonar::CreateTexture(const std::string &_textureName)
+void MSISSonar::CreateTexture(const std::string &_textureName)
 {
   camTexture = Ogre::TextureManager::getSingleton().createManual(
                  "RttTex",
@@ -137,7 +137,7 @@ void FLSonar::CreateTexture(const std::string &_textureName)
 }
 
 //////////////////////////////////////////////////
-void FLSonar::ImageTextureToCV(float _width, int _height, Ogre::Texture* _inTex)
+void MSISSonar::ImageTextureToCV(float _width, int _height, Ogre::Texture* _inTex)
 {
   common::Timer firstPassTimer, secondPassTimer;
 
@@ -152,7 +152,7 @@ void FLSonar::ImageTextureToCV(float _width, int _height, Ogre::Texture* _inTex)
 }
 
 //////////////////////////////////////////////////
-void FLSonar::PostRender()
+void MSISSonar::PostRender()
 {
   ignition::math::Pose3d myPose = this->WorldPose();
   // gzwarn << "Pose x " << myPose.Pos().X() << "Pose y " << myPose.Pos().Y() << "Pose z "
@@ -165,7 +165,7 @@ void FLSonar::PostRender()
 }
 
 /////////////////////////////////////////////////
-void FLSonar::UpdateRenderTarget(Ogre::RenderTarget *_target,
+void MSISSonar::UpdateRenderTarget(Ogre::RenderTarget *_target,
                                  Ogre::Material *_material, Ogre::Camera *_cam,
                                  const bool _updateTex)
 {
@@ -233,7 +233,7 @@ void FLSonar::UpdateRenderTarget(Ogre::RenderTarget *_target,
 }
 
 /////////////////////////////////////////////////
-void FLSonar::notifyRenderSingleObject(Ogre::Renderable *_rend,
+void MSISSonar::notifyRenderSingleObject(Ogre::Renderable *_rend,
                                        const Ogre::Pass* /*pass*/, const Ogre::AutoParamDataSource* /*source*/,
                                        const Ogre::LightList* /*lights*/, bool /*supp*/)
 {
@@ -290,7 +290,7 @@ void FLSonar::notifyRenderSingleObject(Ogre::Renderable *_rend,
 }
 
 //////////////////////////////////////////////////
-void FLSonar::RenderImpl()
+void MSISSonar::RenderImpl()
 {
   common::Timer firstPassTimer, secondPassTimer;
 
@@ -313,128 +313,128 @@ void FLSonar::RenderImpl()
 }
 
 //////////////////////////////////////////////////
-double FLSonar::GetVertFOV() const
+double MSISSonar::GetVertFOV() const
 {
   return this->VertFOV();
 }
 
 //////////////////////////////////////////////////
-double FLSonar::VertFOV() const
+double MSISSonar::VertFOV() const
 {
   return this->vfov;
 }
 
 //////////////////////////////////////////////////
-void FLSonar::SetVertFOV(const double _vfov)
+void MSISSonar::SetVertFOV(const double _vfov)
 {
   this->vfov = _vfov;
 }
 
 
 //////////////////////////////////////////////////
-double FLSonar::GetNearClip() const
+double MSISSonar::GetNearClip() const
 {
   return this->NearClip();
 }
 
 //////////////////////////////////////////////////
-double FLSonar::NearClip() const
+double MSISSonar::NearClip() const
 {
   return this->nearClip;
 }
 
 //////////////////////////////////////////////////
-double FLSonar::GetFarClip() const
+double MSISSonar::GetFarClip() const
 {
   return this->FarClip();
 }
 
 //////////////////////////////////////////////////
-double FLSonar::FarClip() const
+double MSISSonar::FarClip() const
 {
   return this->farClip;
 }
 
 //////////////////////////////////////////////////
-void FLSonar::SetNearClip(const double _near)
+void MSISSonar::SetNearClip(const double _near)
 {
   this->nearClip = _near;
 }
 
 //////////////////////////////////////////////////
-void FLSonar::SetFarClip(const double _far)
+void MSISSonar::SetFarClip(const double _far)
 {
   this->farClip = _far;
 }
 
 //////////////////////////////////////////////////
-int FLSonar::ImageWidth()
+int MSISSonar::ImageWidth()
 {
   return this->imageWidth;
 }
 
 //////////////////////////////////////////////////
-int FLSonar::ImageHeight()
+int MSISSonar::ImageHeight()
 {
   return this->imageHeight;
 }
 
 //////////////////////////////////////////////////
-int FLSonar::BinCount()
+int MSISSonar::BinCount()
 {
   return this->binCount;
 }
 
 //////////////////////////////////////////////////
-int FLSonar::BeamCount()
+int MSISSonar::BeamCount()
 {
   return this->beamCount;
 }
 
 //////////////////////////////////////////////////
-cv::Mat FLSonar::ShaderImage() const
+cv::Mat MSISSonar::ShaderImage() const
 {
   return this->rawImage;
 }
 
 //////////////////////////////////////////////////
-cv::Mat FLSonar::SonarImage() const
+cv::Mat MSISSonar::SonarImage() const
 {
   return this->sonarImage;
 }
 
 //////////////////////////////////////////////////
-cv::Mat FLSonar::SonarMask() const
+cv::Mat MSISSonar::SonarMask() const
 {
   return this->sonarImageMask;
 }
 
 //////////////////////////////////////////////////
-void FLSonar::SetImageWidth(const int &_value)
+void MSISSonar::SetImageWidth(const int &_value)
 {
   this->imageWidth = _value;
 }
 
 //////////////////////////////////////////////////
-void FLSonar::SetImageHeight(const int &_value)
+void MSISSonar::SetImageHeight(const int &_value)
 {
   this->imageHeight = _value;
 }
 
 //////////////////////////////////////////////////
-void FLSonar::SetBinCount(const int &_value)
+void MSISSonar::SetBinCount(const int &_value)
 {
   this->binCount = _value;
 }
 
 //////////////////////////////////////////////////
-void FLSonar::SetBeamCount(const int &_value)
+void MSISSonar::SetBeamCount(const int &_value)
 {
   this->beamCount = _value;
 }
 
 //////////////////////////////////////////////////
-bool FLSonar::SetProjectionType(const std::string &_type)
+bool MSISSonar::SetProjectionType(const std::string &_type)
 {
   bool result = true;
 
@@ -448,7 +448,7 @@ bool FLSonar::SetProjectionType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void FLSonar::PreRender(const math::Pose &_pose)
+void MSISSonar::PreRender(const math::Pose &_pose)
 {
   ignition::math::Pose3d poseIgnition(_pose.pos.x, _pose.pos.y, _pose.pos.z,
     _pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
@@ -456,7 +456,7 @@ void FLSonar::PreRender(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-void FLSonar::GetSonarImage()
+void MSISSonar::GetSonarImage()
 {
   int sonarImageWidth = this->imageWidth;
   int sonarImageHeight = this->imageHeight;
@@ -489,7 +489,7 @@ void FLSonar::GetSonarImage()
 }
 
 //////////////////////////////////////////////////
-void FLSonar::CvToSonarBin(std::vector<float> &_accumData)
+void MSISSonar::CvToSonarBin(std::vector<float> &_accumData)
 {
   for (int i_beam = 0; i_beam < this->beamCount - 1; i_beam++)
   {
@@ -532,7 +532,7 @@ void FLSonar::CvToSonarBin(std::vector<float> &_accumData)
 }
 
 //////////////////////////////////////////////////
-void FLSonar::TransferTableToSonar(const std::vector<float> &_accumData, const std::vector<int> &_transfer)
+void MSISSonar::TransferTableToSonar(const std::vector<float> &_accumData, const std::vector<int> &_transfer)
 {
   for (size_t i = 0; i < _transfer.size(); ++i)
   {
@@ -543,7 +543,7 @@ void FLSonar::TransferTableToSonar(const std::vector<float> &_accumData, const s
 }
 
 //////////////////////////////////////////////////
-void FLSonar::GenerateTransferTable(std::vector<int> &_transfer)
+void MSISSonar::GenerateTransferTable(std::vector<int> &_transfer)
 {
   // set the origin
   cv::Point2f origin(this->sonarImage.cols / 2, this->sonarImage.rows / 2);
@@ -578,7 +578,7 @@ void FLSonar::GenerateTransferTable(std::vector<int> &_transfer)
 
 //////////////////////////////////////////////////
 template <typename T>
-void FLSonar::DebugPrintMatrixToFile(const std::string &_filename, const std::vector<T> &_matrix)
+void MSISSonar::DebugPrintMatrixToFile(const std::string &_filename, const std::vector<T> &_matrix)
 {
   FILE* imageFile;
   imageFile = fopen(_filename.c_str(), "w");
@@ -607,7 +607,7 @@ void FLSonar::DebugPrintMatrixToFile(const std::string &_filename, const std::ve
 }
 
 //////////////////////////////////////////////////
-void FLSonar::DebugPrintImageToFile(const std::string &_filename, const cv::Mat &_image)
+void MSISSonar::DebugPrintImageToFile(const std::string &_filename, const cv::Mat &_image)
 {
   FILE* imageFile;
   imageFile = fopen(_filename.c_str(), "w");
@@ -621,7 +621,7 @@ void FLSonar::DebugPrintImageToFile(const std::string &_filename, const cv::Mat 
 }
 
 //////////////////////////////////////////////////
-void FLSonar::DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int &_channel)
+void MSISSonar::DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int &_channel)
 {
   FILE* imageFile;
   imageFile = fopen(_filename.c_str(), "w");
@@ -646,7 +646,7 @@ void FLSonar::DebugPrintImageChannelToFile(const std::string &_filename, const c
 }
 
 //////////////////////////////////////////////////
-void FLSonar::DebugPrintTexture(Ogre::Texture *_texture)
+void MSISSonar::DebugPrintTexture(Ogre::Texture *_texture)
 {
   Ogre::Image img;
   _texture->convertToImage(img);
@@ -654,7 +654,7 @@ void FLSonar::DebugPrintTexture(Ogre::Texture *_texture)
 }
 
 //////////////////////////////////////////////////
-void FLSonar::PixelBoxTextureToCV(Ogre::Texture *_texture, cv::Mat &_image, int _width, int _height)
+void MSISSonar::PixelBoxTextureToCV(Ogre::Texture *_texture, cv::Mat &_image, int _width, int _height)
 {
   Ogre::HardwarePixelBufferSharedPtr pixelBuffer;
 
@@ -670,7 +670,7 @@ void FLSonar::PixelBoxTextureToCV(Ogre::Texture *_texture, cv::Mat &_image, int 
 }
 
 //////////////////////////////////////////////////
-float FLSonar::Sigmoid(float x)
+float MSISSonar::Sigmoid(float x)
 {
   float beta = 18, x0 = 0.666666667;
   float t = (x - x0) * beta;

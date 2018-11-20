@@ -9,7 +9,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/common/MeshManager.hh"
 
-#include <foward_looking_gazebo_sonar/FLSonar.hh>
+#include <mechanical_scanning_imaging_sonar_gazebo/FLSonar.hh>
 
 // OpenCV includes
 #include <opencv2/opencv.hpp>

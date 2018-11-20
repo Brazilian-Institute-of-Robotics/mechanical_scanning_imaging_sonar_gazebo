@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>foward_looking_gazebo_sonar</name>
+  <name>mechanical_scanning_immaging_sonar</name>
   <version>0.0.0</version>
-  <description>Foward Looking Sonar Package based on ROCKY package</description>
+  <description>Mechanica scanning Sonar Package based on ROCKY package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
