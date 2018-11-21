@@ -92,15 +92,26 @@ public:
                                         const Ogre::LightList *_ll, bool _supp);
 
   /// \brief Get the vertical field-of-view.
-  /// \return The vertical field of view of the laser sensor.
+  /// \return The vertical field of view of the sonar sensor.
   /// \deprecated See VertFOV()
 public:
   double GetVertFOV() const;
 
+  /// \brief Get the horizontal field-of-view.
+  /// \return The horizontal field of view of the sonar sensor.
+  /// \deprecated See HorzFOV()
+public:
+  double GetHorzFOV() const;
+
   /// \brief Get the vertical field-of-view.
-  /// \return The vertical field of view of the laser sensor.
+  /// \return The vertical field of view of the sonar sensor.
 public:
   double VertFOV() const;
+
+  /// \brief Get the horizontal field-of-view.
+  /// \return The horizontal field of view of the sonar sensor.
+public:
+  double HorzFOV() const;
 
   /// \brief Get near clip
   /// \return near clip distance
@@ -155,6 +166,11 @@ public:
 public:
   void SetVertFOV(const double _vfov);
 
+  /// \brief Set the horizontal fov
+  /// \param[in] _hfov horizontal fov
+public:
+  void SetHorzFOV(const double _hfov);
+
   // Documentation inherited.
 public:
   virtual void RenderImpl();
@@ -205,7 +221,7 @@ public:
    *
    */
 public:
-  void GetSonarImage();
+  void GetSonarImage(double angleDisplacement);
 
   /**
    * @brief Cv mat to sonar bin data
@@ -220,7 +236,7 @@ public:
    * @param _transfer Transfer vector that will be Generated
    */
 protected:
-  void GenerateTransferTable(std::vector<int> &_transfer);
+  void GenerateTransferTable(std::vector<int> &_transfer, double _angleDisplacement);
 
   /**
    * @brief Transfer the sonar bin data to cv::Mat sonarImage using transfer matrix
@@ -320,6 +336,10 @@ protected:
   /// \brief Vertical field-of-view.
 protected:
   double vfov;
+
+  /// \brief Horizontal field-of-view.
+protected:
+  double hfov;
 
 
   /// \brief Near clip plane.

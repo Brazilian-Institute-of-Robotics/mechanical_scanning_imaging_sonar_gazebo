@@ -24,6 +24,14 @@
 
 namespace gazebo
 {
+
+enum RotAxis
+{
+  X = 0,
+  Y = 1,
+  Z = 2
+};
+
 class MSISonarRos : public SensorPlugin
 {
 public:
@@ -53,6 +61,12 @@ public:
    */
   void OnPostRender();
 
+  /**
+   * @brief Called for pose updating
+   *
+   */
+  void OnPoseUpdate();
+
 public:
   //// \brief Scene parent containing sensor
   rendering::ScenePtr scene;
@@ -69,6 +83,10 @@ public:
   //// \brief sonar sensor where the link link is attached to
   std::shared_ptr<gazebo::rendering::MSISonar> sonar;
 
+protected:
+  /// \brief Get angle from pose
+  double GetAngleFromPose(math::Pose _pose);
+
 private:
   // Pointer to the model
   sensors::SensorPtr sensor;
@@ -79,7 +97,11 @@ private:
   // Pointer to the update event connection
   event::ConnectionPtr updatePostRender;
 
+  // Pointer to the update event connection
   event::ConnectionPtr updatePreRender;
+
+  // Pointer to the update event connection
+  event::ConnectionPtr updatePose;
 
   // Ros node handle
   std::unique_ptr<ros::NodeHandle> rosNode;
@@ -95,6 +117,33 @@ private:
 
   // Image transport publisher for shader image
   image_transport::Publisher shaderImagePub;
+
+  // Rotational axis 1 -X 2 -Y 3 -Z
+  RotAxis rotationAxis;
+
+  // Initial angle
+  double angleInit;
+
+  // Actual angle
+  double angleAct;
+
+  // Delta rotion
+  double angDispl;
+
+  // Maximum angle
+  double angleMax;
+
+  // Minimum angle
+  double angleMin;
+
+  // Delta angular Velocity
+  double angularVelocity;
+
+  // Sampling frequency
+  double samplingFrequency;
+
+  // Timer to check the update frequency
+  common::Timer updateTimer;
 
   // Debug flag
   bool bDebug;

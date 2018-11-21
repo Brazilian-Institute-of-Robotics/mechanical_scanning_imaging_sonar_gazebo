@@ -5,21 +5,31 @@
 <sensor name='MSISonar' type='camera'>
 
     <plugin name="SonarVisual" filename="libMechanicalScanningImagingSonarGazebo.so" >
+        <update_rate>10</update_rate>
         <topic>car_sonar/MSISonar</topic>
         <debug>1</debug>
+        <axis_rotation>2</axis_rotation>
+        <angle_max>${pi/4}</angle_max>
+        <angle_min>${-pi/4}</angle_min>
+        <axis_rotation>2</axis_rotation>
+        <angular_velocity>${pi/4}</angular_velocity>
         <link_reference>car_sonar/test_link</link_reference>
         <horizontal_fov>${pi/2}</horizontal_fov>
         <vfov>${pi/4}</vfov>
         <bin_count>720</bin_count>
-        <beam_count>720</beam_count>
+        <beam_count>20</beam_count>
         <image>
-            <width>720</width>
+            <width>20</width>
             <height>720</height>
             <format>R32G32B32</format>
         </image>
+        <sonar_output>
+            <width>720</width>
+            <height>720</height>
+        </sonar_output>
         <clip>
             <near>0.1</near>
-            <far>5</far>
+            <far>4</far>
         </clip>
         <noise>
             <type>gaussian</type>

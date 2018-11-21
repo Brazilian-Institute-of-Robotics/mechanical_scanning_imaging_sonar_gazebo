@@ -65,10 +65,14 @@ void MSISonar::Load(sdf::ElementPtr _sdf)
 
   this->SetVertFOV(_sdf->Get<double>("vfov"));
 
+  double aspectRatio = 0.2;
+
   Ogre::Radian fov_now(this->vfov);
   this->camera->setFOVy(fov_now);
-  this->camera->setAspectRatio(1.0);
+  this->camera->setAspectRatio(aspectRatio);
   this->camera->setAutoAspectRatio(0);
+
+  this->SetHorzFOV(this->GetVertFOV()*aspectRatio);
 
 
 
@@ -80,6 +84,18 @@ void MSISonar::Load(sdf::ElementPtr _sdf)
 
   this->SetBinCount(gazebo::SDFTool::GetSDFElement<double>(_sdf, "bin_count"));
   this->SetBeamCount(gazebo::SDFTool::GetSDFElement<double>(_sdf, "beam_count"));
+
+  // int sonarImageWidth = this->imageWidth;
+  // int sonarImageHeight = this->imageHeight;
+
+  int sonarImageWidth = gazebo::SDFTool::GetSDFElement<double>(_sdf, "width", "sonar_output");
+  int sonarImageHeight = gazebo::SDFTool::GetSDFElement<double>(_sdf, "height", "sonar_output");
+
+  this->sonarImage = cv::Mat::zeros( sonarImageHeight, sonarImageWidth, CV_32F);
+  this->sonarImageMask = cv::Mat::zeros(sonarImageHeight, sonarImageWidth, CV_8UC1);
+  
+  this->sonarImage.setTo(0);
+  this->sonarImageMask.setTo(-1);
 }
 
 //////////////////////////////////////////////////
@@ -159,9 +175,12 @@ void MSISonar::PostRender()
   //   << myPose.Pos().Z() << std::endl;
   // gzwarn << " Aspect Ratio: " << this->camera->getAspectRatio() << ", auto aspcet: "
   //   << this->camera->getAutoAspectRatio() << std::endl;
+  // gzwarn << " Horizontal FOV: " << this->HorzFOV() << ", auto aspcet: "
+  //   << this->camera->getAutoAspectRatio() << std::endl;
   // gzwarn << "--------------------Starte-----------------" << std::endl;
   // this->GetScene()->PrintSceneGraph();
   // gzwarn << "---------------------------ENDED--------------" << std::endl;
+  // this->DebugPrintTexture(this->camTexture);
 }
 
 /////////////////////////////////////////////////
@@ -319,15 +338,33 @@ double MSISonar::GetVertFOV() const
 }
 
 //////////////////////////////////////////////////
+double MSISonar::GetHorzFOV() const
+{
+  return this->HorzFOV();
+}
+
+//////////////////////////////////////////////////
 double MSISonar::VertFOV() const
 {
   return this->vfov;
 }
 
 //////////////////////////////////////////////////
+double MSISonar::HorzFOV() const
+{
+  return this->hfov;
+}
+
+//////////////////////////////////////////////////
 void MSISonar::SetVertFOV(const double _vfov)
 {
   this->vfov = _vfov;
+}
+
+//////////////////////////////////////////////////
+void MSISonar::SetHorzFOV(const double _hfov)
+{
+  this->hfov = _hfov;
 }
 
 
@@ -456,32 +493,32 @@ void MSISonar::PreRender(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
-void MSISonar::GetSonarImage()
+void MSISonar::GetSonarImage(double _angleDisplacement)
 {
-  int sonarImageWidth = this->imageWidth;
-  int sonarImageHeight = this->imageHeight;
-
-  this->sonarImage = cv::Mat::zeros(sonarImageWidth, sonarImageHeight, CV_32F);
-  this->sonarImageMask = cv::Mat::zeros(sonarImageWidth, sonarImageHeight, CV_8UC1);
-
-
+  // int sonarImageWidth = this->imageWidth;
+  // int sonarImageHeight = this->imageHeight;
+  
+  // this->sonarImage = cv::Mat::zeros( sonarImageHeight, sonarImageWidth, CV_32F);
+  // this->sonarImageMask = cv::Mat::zeros(sonarImageHeight, sonarImageWidth, CV_8UC1);
+  
+  // this->sonarImage.setTo(0);
+  // this->sonarImageMask.setTo(-1);
+  
   this->ImageTextureToCV(this->imageWidth, this->imageHeight, this->camTexture);
 
   // this->DebugPrintImageChannelToFile("TesteBlue.dat", this->rawImage,0);
   // this->DebugPrintImageChannelToFile("TesteGreen.dat", this->rawImage,1);
 
   std::vector<float> accumData;
-  accumData.assign(this->binCount * this->beamCount, 0.0);
+  accumData.assign(this->binCount * this->beamCount, 0);
   this->CvToSonarBin(accumData);
 
-  // this->DebugPrintMatrixToFile<float>("Teste2.dat", accumData);
+  this->DebugPrintMatrixToFile<float>("Teste2.dat", accumData);
 
 
   std::vector<int> transferTable;
   transferTable.clear();
-  this->sonarImage.setTo(0);
-  this->sonarImageMask.setTo(0);
-  this->GenerateTransferTable(transferTable);
+  this->GenerateTransferTable(transferTable, _angleDisplacement);
 
   // this->DebugPrintMatrixToFile<int>("Teste3.dat", transferTable);
 
@@ -491,7 +528,7 @@ void MSISonar::GetSonarImage()
 //////////////////////////////////////////////////
 void MSISonar::CvToSonarBin(std::vector<float> &_accumData)
 {
-  for (int i_beam = 0; i_beam < this->beamCount - 1; i_beam++)
+  for (int i_beam = 0; i_beam < this->beamCount; i_beam++)
   {
     cv::Mat roi = this->rawImage(cv::Rect(i_beam * ceil(this->imageWidth / this->beamCount), 0,
       ceil(this->imageWidth / this->beamCount), this->rawImage.rows));
@@ -524,8 +561,9 @@ void MSISonar::CvToSonarBin(std::vector<float> &_accumData)
       float intensity = (1.0 / this->sonarBinsDepth[bin_idx]) * this->Sigmoid(roi.at<cv::Vec3f>(xIndex, yIndex)[0]);
       this->bins[bin_idx] += intensity;
     }
-    int id_beam = ((-this->vfov / 2 + i_beam * this->vfov / this->beamCount + M_PI)
-      / (2 * M_PI)) * (this->beamCount - 1);
+    // int id_beam = ((-this->HorzFOV() / 2 + i_beam * this->HorzFOV() / this->beamCount + M_PI)
+    //   / (2 * M_PI)) * (this->beamCount - 1);
+    int id_beam = i_beam;
     for (size_t i = 0; i < this->binCount; ++i)
       _accumData[id_beam * this->binCount + i] = this->bins[i];
   }
@@ -543,7 +581,7 @@ void MSISonar::TransferTableToSonar(const std::vector<float> &_accumData, const 
 }
 
 //////////////////////////////////////////////////
-void MSISonar::GenerateTransferTable(std::vector<int> &_transfer)
+void MSISonar::GenerateTransferTable(std::vector<int> &_transfer, double _angleDisplacement)
 {
   // set the origin
   cv::Point2f origin(this->sonarImage.cols / 2, this->sonarImage.rows / 2);
@@ -559,17 +597,19 @@ void MSISonar::GenerateTransferTable(std::vector<int> &_transfer)
       point.y = point.y * static_cast<float>(this->binCount / (this->sonarImage.rows * 0.5));
 
       double radius = sqrt(point.x * point.x + point.y * point.y);
-      double theta = atan2(-point.x, -point.y);
+      double theta = atan2(-point.x, -point.y) - _angleDisplacement;
 
       // pixels out the sonar image
-      if (radius > this->binCount || !radius || theta < -this->vfov / 2 || theta > this->vfov / 2)
+      if (radius > this->binCount || !radius || theta < -this->HorzFOV() / 2 || theta > this->HorzFOV() / 2)
+      {
         _transfer.push_back(-1);
+      }
 
       // pixels in the sonar image
       else
       {
         this->sonarImageMask.at<uchar>(j, i) = 255;
-        int idBeam = static_cast<int>(((theta + M_PI) / (2 * M_PI)) * (this->beamCount - 1));
+        int idBeam = static_cast<int>(((theta + _angleDisplacement + M_PI) / (2 * M_PI)) * (this->beamCount - 1));
         _transfer.push_back(idBeam * this->binCount + static_cast<float>(radius));
       }
     }

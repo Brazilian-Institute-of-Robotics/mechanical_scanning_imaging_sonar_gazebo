@@ -52,10 +52,10 @@ add_library(MSISonar src/MSISonar.cc)
 target_link_libraries(MSISonar ${GAZEBO_LIBRARIES} ${OpenCV_LIBRARIES} ${MECHANICAL_SCANNING_IMAGING_SONAR_LIST})
 list(APPEND MECHANICAL_SCANNING_IMAGING_SONAR_LIST MSISonar)
 
-add_library(MechanicalScaningImagingSonarGazebo src/MSISonarRos.cc)
-target_link_libraries(MechanicalScaningImagingSonarGazebo ${catkin_LIBRARIES} ${MECHANICAL_SCANNING_IMAGING_SONAR_LIST})
-add_dependencies(MechanicalScaningImagingSonarGazebo ${catkin_EXPORTED_TARGETS})
-list(APPEND MECHANICAL_SCANNING_IMAGING_SONAR_LIST MechanicalScaningImagingSonarGazebo)
+add_library(MechanicalScanningImagingSonarGazebo src/MSISonarRos.cc)
+target_link_libraries(MechanicalScanningImagingSonarGazebo ${catkin_LIBRARIES} ${MECHANICAL_SCANNING_IMAGING_SONAR_LIST})
+add_dependencies(MechanicalScanningImagingSonarGazebo ${catkin_EXPORTED_TARGETS})
+list(APPEND MECHANICAL_SCANNING_IMAGING_SONAR_LIST MechanicalScanningImagingSonarGazebo)
 
 install(TARGETS ${MECHANICAL_SCANNING_IMAGING_SONAR_LIST} ${MECHANICAL_SCANNING_IMAGING_SONAR_LIST}
   DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

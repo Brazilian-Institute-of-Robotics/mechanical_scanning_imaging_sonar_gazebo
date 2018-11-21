@@ -6,6 +6,8 @@
 
 #include <sensor_msgs/Range.h>
 
+#include "gazebo/common/Events.hh"
+
 
 namespace gazebo
 {
@@ -21,6 +23,8 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
                               std::bind(&MSISonarRos::OnPostRender, this));
   this->updatePreRender =  event::Events::ConnectPreRender(
                              std::bind(&MSISonarRos::OnPreRender, this));
+  this->updatePose = event::Events::ConnectWorldUpdateEnd(
+                             std::bind(&MSISonarRos::OnPoseUpdate, this));
 
 
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
@@ -41,6 +45,18 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   current = parent->GetChildLink(gazebo::SDFTool::GetSDFElement<std::string>(_sdf, "link_reference"));
   GZ_ASSERT(current, "It must have this link");
+
+  angleMax = gazebo::SDFTool::GetSDFElement<double>(_sdf, "angle_max");
+  angleMin = gazebo::SDFTool::GetSDFElement<double>(_sdf, "angle_min");
+
+  rotationAxis = static_cast<RotAxis>(gazebo::SDFTool::GetSDFElement<int>(_sdf, "axis_rotation"));
+  angleInit = this->GetAngleFromPose(current->GetRelativePose());
+  angleAct = angleInit;
+
+  samplingFrequency = gazebo::SDFTool::GetSDFElement<double>(_sdf, "update_rate");
+  updateTimer.Start();
+
+  angularVelocity = gazebo::SDFTool::GetSDFElement<double>(_sdf, "angular_velocity");
 
   this->scene = rendering::get_scene(worldName);
 
@@ -95,7 +111,23 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 void MSISonarRos::OnPreRender()
 {
   this->sonar->PreRender(current->GetWorldCoGPose());
-  this->sonar->GetSonarImage();
+
+  angDispl = angleInit - this->GetAngleFromPose(current->GetRelativePose());
+  angleAct = this->GetAngleFromPose(current->GetRelativePose());
+
+  this->sonar->GetSonarImage(angDispl);
+}
+
+void MSISonarRos::OnPoseUpdate()
+{
+  if(angleMax==angleMin)
+    angularVelocity = angularVelocity;
+  else if(angleMax <= angDispl )
+    angularVelocity = std::abs(angularVelocity);
+  else if(angleMin >= angDispl)
+    angularVelocity = -std::abs(angularVelocity);
+
+  current->SetAngularVel(math::Vector3(0,0,angularVelocity));
 }
 
 void MSISonarRos::OnUpdate()
@@ -109,6 +141,11 @@ void MSISonarRos::OnUpdate()
 
 void MSISonarRos::OnPostRender()
 {
+  if(updateTimer.GetElapsed().Double() > 1/samplingFrequency)
+    {gzwarn << updateTimer.GetElapsed().Double() << std::endl;updateTimer.Start(); updateTimer = common::Timer(); updateTimer.Start(); }
+  else
+    return;
+  
   this->sonar->PostRender();
 
   // Publish sonar image
@@ -137,6 +174,23 @@ void MSISonarRos::OnPostRender()
     this->shaderImagePub.publish(msg);
   }
 }
+
+double MSISonarRos::GetAngleFromPose(math::Pose _pose)
+{
+  switch(rotationAxis)
+  {
+    case RotAxis::X:
+      return _pose.rot.GetRoll();
+    case RotAxis::Y:
+      return _pose.rot.GetPitch();
+    case RotAxis::Z:
+      return _pose.rot.GetYaw();
+    default:
+      gzerr << "This axis does not exists" << std::endl;
+      break;
+  }
+}
+
 }  // namespace gazebo
 
 
