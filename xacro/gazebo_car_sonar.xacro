@@ -2,34 +2,35 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 <gazebo reference="car_sonar/test_link">
 
-<sensor name='MSISonar' type='camera'>
+<!-- <sensor name='MSISonar' type='camera'>
 
     <plugin name="SonarVisual" filename="libMechanicalScanningImagingSonarGazebo.so" >
-        <update_rate>10</update_rate>
+        <update_rate>15</update_rate>
+        <local_rotation>${20*pi/180} 0 0</local_rotation>
         <topic>car_sonar/MSISonar</topic>
-        <debug>1</debug>
+        <debug>0</debug>
         <axis_rotation>2</axis_rotation>
-        <angle_max>${pi/4}</angle_max>
-        <angle_min>${-pi/4}</angle_min>
+        <angle_max>${120*pi/180}</angle_max>
+        <angle_min>${-120*pi/180}</angle_min>
         <axis_rotation>2</axis_rotation>
         <angular_velocity>${pi/4}</angular_velocity>
         <link_reference>car_sonar/test_link</link_reference>
-        <horizontal_fov>${pi/2}</horizontal_fov>
-        <vfov>${pi/4}</vfov>
-        <bin_count>720</bin_count>
-        <beam_count>20</beam_count>
+        <hfov>${3*pi/180}</hfov>
+        <vfov>${35*pi/180}</vfov>
+        <bin_count>1350</bin_count>
+        <beam_count>1</beam_count>
         <image>
-            <width>20</width>
-            <height>720</height>
+            <width>10</width>
+            <height>1350</height>
             <format>R32G32B32</format>
         </image>
         <sonar_output>
-            <width>720</width>
-            <height>720</height>
+            <width>1080</width>
+            <height>1080</height>
         </sonar_output>
         <clip>
-            <near>0.1</near>
-            <far>4</far>
+            <near>0.3</near>
+            <far>75</far>
         </clip>
         <noise>
             <type>gaussian</type>
@@ -37,7 +38,45 @@
             <stddev>0.1</stddev>
         </noise>
     </plugin>  
-</sensor>  
+</sensor>   -->
+
+<sensor name='MSISonar' type='camera'>
+
+    <plugin name="SonarVisual" filename="libMechanicalScanningImagingSonarGazebo.so" >
+        <update_rate>100</update_rate>
+        <local_rotation>0 ${pi/5} 0</local_rotation>
+        <topic>car_sonar/MSISonar</topic>
+        <debug>1</debug>
+        <axis_rotation>2</axis_rotation>
+        <angle_max>${120*pi/180}</angle_max>
+        <angle_min>${-120*pi/180}</angle_min>
+        <axis_rotation>2</axis_rotation>
+        <angular_velocity>${0.5*pi/6}</angular_velocity>
+        <link_reference>car_sonar/test_link</link_reference>
+        <hfov>${3*pi/180}</hfov>
+        <vfov>${35*pi/180}</vfov>
+        <bin_count>1035</bin_count>
+        <beam_count>1</beam_count>
+        <image>
+            <width>180</width>
+            <height>1035</height>
+            <format>R32G32B32</format>
+        </image>
+        <sonar_output>
+            <width>720</width>
+            <height>720</height>
+        </sonar_output>
+        <clip>
+            <near>0.3</near>
+            <far>80</far>
+        </clip>
+        <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.1</stddev>
+        </noise>
+    </plugin>  
+</sensor>
 
 </gazebo>
 

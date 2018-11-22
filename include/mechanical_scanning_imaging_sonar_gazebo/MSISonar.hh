@@ -199,6 +199,21 @@ protected:
   void ImageTextureToCV(float _width, int _height, Ogre::Texture* _inTex);
 
   /**
+   * @brief Set Local Rotation
+   *
+   * @param _localRotation
+   */
+protected:
+  void SetLocalRotation(const ignition::math::Vector3d _localRotation);
+
+  /**
+   * @brief Getter Local Rotation
+   *
+   */
+public:
+  ignition::math::Vector3d LocalRotation();
+
+  /**
    * @brief Documentation Iherited
    *
    * @param _type
@@ -214,7 +229,7 @@ public:
    * @param _pose Set position of the camera
    */
 public:
-  void PreRender(const math::Pose &_pose);
+  void PreRender(math::Pose _pose);
 
   /**
    * @brief Get the Sonar Image to cartesian cv::Mat
@@ -397,6 +412,10 @@ protected:
   //// \brief Number of beams
 protected:
   int beamCount;
+
+  //// \brief Local Rotation
+protected:
+  ignition::math::Vector3d localRotation;
 
   //// \brief Sonar image from ogre
   Ogre::Image imgSonar;

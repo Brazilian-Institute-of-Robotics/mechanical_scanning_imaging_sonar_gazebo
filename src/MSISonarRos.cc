@@ -53,6 +53,8 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   angleInit = this->GetAngleFromPose(current->GetRelativePose());
   angleAct = angleInit;
 
+  this->localRotation = _sdf->Get<ignition::math::Vector3d>("local_rotation");
+
   samplingFrequency = gazebo::SDFTool::GetSDFElement<double>(_sdf, "update_rate");
   updateTimer.Start();
 
@@ -110,10 +112,15 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
 void MSISonarRos::OnPreRender()
 {
+  math::Pose prePose = current->GetRelativePose();
+  current->SetRelativePose( prePose + math::Pose(0,0,0,this->localRotation.X(),this->localRotation.Y(),this->localRotation.Z()));
   this->sonar->PreRender(current->GetWorldCoGPose());
+  current->SetRelativePose(prePose);
 
   angDispl = angleInit - this->GetAngleFromPose(current->GetRelativePose());
   angleAct = this->GetAngleFromPose(current->GetRelativePose());
+
+  // gzwarn << "Angle Disp" << angDispl << std::endl;
 
   this->sonar->GetSonarImage(angDispl);
 }
@@ -142,7 +149,10 @@ void MSISonarRos::OnUpdate()
 void MSISonarRos::OnPostRender()
 {
   if(updateTimer.GetElapsed().Double() > 1/samplingFrequency)
-    {gzwarn << updateTimer.GetElapsed().Double() << std::endl;updateTimer.Start(); updateTimer = common::Timer(); updateTimer.Start(); }
+  {
+    updateTimer.Start(); 
+    updateTimer = common::Timer(); updateTimer.Start(); 
+  }
   else
     return;
   

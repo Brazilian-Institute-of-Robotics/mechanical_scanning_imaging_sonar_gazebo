@@ -13,6 +13,9 @@
   <xacro:property name="cog" value="0 0 0"/>
   <!-- Fluid density -->
   <xacro:property name="rho" value="1028"/>
+
+  <link name="world"/>
+
   <!-- Vehicle macro -->
   <xacro:macro name="car_sonar_base" params="namespace *gazebo">
     <!-- Rigid body description of the base link -->
@@ -72,6 +75,12 @@
       <axis xyz="0 0 1" />
       <parent link="${namespace}/base_link" />
       <child link="${namespace}/test_link" />
+    </joint>
+
+    <joint name="${namespace}/fixed_joint" type="fixed">
+      <origin xyz="0 0 6" rpy="0 ${0} 0"/>
+      <parent link="world" />
+      <child link="${namespace}/base_link" />
     </joint>
     
     <!-- Set up hydrodynamic plugin given as input parameter -->

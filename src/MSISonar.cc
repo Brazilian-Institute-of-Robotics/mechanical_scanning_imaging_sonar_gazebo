@@ -65,7 +65,9 @@ void MSISonar::Load(sdf::ElementPtr _sdf)
 
   this->SetVertFOV(_sdf->Get<double>("vfov"));
 
-  double aspectRatio = 0.2;
+  this->SetHorzFOV(_sdf->Get<double>("hfov"));
+  
+  double aspectRatio = this->HorzFOV()/this->VertFOV();
 
   Ogre::Radian fov_now(this->vfov);
   this->camera->setFOVy(fov_now);
@@ -85,17 +87,19 @@ void MSISonar::Load(sdf::ElementPtr _sdf)
   this->SetBinCount(gazebo::SDFTool::GetSDFElement<double>(_sdf, "bin_count"));
   this->SetBeamCount(gazebo::SDFTool::GetSDFElement<double>(_sdf, "beam_count"));
 
+  this->SetLocalRotation(_sdf->Get<ignition::math::Vector3d>("local_rotation"));
+
   // int sonarImageWidth = this->imageWidth;
   // int sonarImageHeight = this->imageHeight;
 
   int sonarImageWidth = gazebo::SDFTool::GetSDFElement<double>(_sdf, "width", "sonar_output");
   int sonarImageHeight = gazebo::SDFTool::GetSDFElement<double>(_sdf, "height", "sonar_output");
 
-  this->sonarImage = cv::Mat::zeros( sonarImageHeight, sonarImageWidth, CV_32F);
-  this->sonarImageMask = cv::Mat::zeros(sonarImageHeight, sonarImageWidth, CV_8UC1);
+  this->sonarImage = cv::Mat::zeros( sonarImageWidth, sonarImageHeight, CV_32F);
+  this->sonarImageMask = cv::Mat::zeros( sonarImageWidth, sonarImageHeight,CV_8UC1);
   
   this->sonarImage.setTo(0);
-  this->sonarImageMask.setTo(-1);
+  this->sonarImageMask.setTo(0);
 }
 
 //////////////////////////////////////////////////
@@ -405,6 +409,18 @@ void MSISonar::SetFarClip(const double _far)
 }
 
 //////////////////////////////////////////////////
+void MSISonar::SetLocalRotation(const ignition::math::Vector3d _localRotation)
+{
+  this->localRotation = _localRotation;
+}
+
+//////////////////////////////////////////////////
+ignition::math::Vector3d MSISonar::LocalRotation()
+{
+  return this->localRotation;
+}
+
+//////////////////////////////////////////////////
 int MSISonar::ImageWidth()
 {
   return this->imageWidth;
@@ -485,10 +501,29 @@ bool MSISonar::SetProjectionType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void MSISonar::PreRender(const math::Pose &_pose)
+void MSISonar::PreRender(math::Pose _pose)
 {
+
+  // math::Quaternion localRotationQuaternion(this->LocalRotation().X(), this->LocalRotation().Y(), this->LocalRotation().Z());
+
+  
+
+  // // ignition::math::Pose3d poseIgnition(_pose.pos.x, _pose.pos.y, _pose.pos.z,
+  // //   _pose.rot.w + localRotationQuaternion.W(),
+  // //   _pose.rot.x + localRotationQuaternion.X(),
+  // //   _pose.rot.y + localRotationQuaternion.Y(),
+  // //   _pose.rot.z + localRotationQuaternion.Z());
+
+  // gzwarn << _pose.rot.x << " " << _pose.rot.y << "  " << _pose.rot.z << _pose.rot.w << std::endl;
+
+  // _pose.rot += localRotationQuaternion;
+
+
+  // gzwarn << _pose.rot.x << " " << _pose.rot.y << "  " << _pose.rot.z << _pose.rot.w << std::endl; 
+
   ignition::math::Pose3d poseIgnition(_pose.pos.x, _pose.pos.y, _pose.pos.z,
     _pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
+
   this->SetWorldPose(poseIgnition);
 }
 
@@ -498,11 +533,11 @@ void MSISonar::GetSonarImage(double _angleDisplacement)
   // int sonarImageWidth = this->imageWidth;
   // int sonarImageHeight = this->imageHeight;
   
-  // this->sonarImage = cv::Mat::zeros( sonarImageHeight, sonarImageWidth, CV_32F);
-  // this->sonarImageMask = cv::Mat::zeros(sonarImageHeight, sonarImageWidth, CV_8UC1);
+  // this->sonarImage = cv::Mat::zeros( sonarImageWidth,sonarImageHeight, CV_32F);
+  // this->sonarImageMask = cv::Mat::zeros(sonarImageWidth, sonarImageHeight, CV_8UC1);
   
   // this->sonarImage.setTo(0);
-  // this->sonarImageMask.setTo(-1);
+  // this->sonarImageMask.setTo(0);
   
   this->ImageTextureToCV(this->imageWidth, this->imageHeight, this->camTexture);
 
@@ -510,14 +545,15 @@ void MSISonar::GetSonarImage(double _angleDisplacement)
   // this->DebugPrintImageChannelToFile("TesteGreen.dat", this->rawImage,1);
 
   std::vector<float> accumData;
-  accumData.assign(this->binCount * this->beamCount, 0);
+  accumData.assign(this->binCount * this->beamCount, 0.0);
   this->CvToSonarBin(accumData);
 
   this->DebugPrintMatrixToFile<float>("Teste2.dat", accumData);
 
-
   std::vector<int> transferTable;
   transferTable.clear();
+
+
   this->GenerateTransferTable(transferTable, _angleDisplacement);
 
   // this->DebugPrintMatrixToFile<int>("Teste3.dat", transferTable);
@@ -539,8 +575,6 @@ void MSISonar::CvToSonarBin(std::vector<float> &_accumData)
     unsigned int width = roi.rows;
     unsigned int height = roi.cols;
 
-
-
     // calculate depth histogram
     float* ptr = reinterpret_cast<float*>(roi.data);
     for (int i = 0; i < width * height; i++)
@@ -561,9 +595,9 @@ void MSISonar::CvToSonarBin(std::vector<float> &_accumData)
       float intensity = (1.0 / this->sonarBinsDepth[bin_idx]) * this->Sigmoid(roi.at<cv::Vec3f>(xIndex, yIndex)[0]);
       this->bins[bin_idx] += intensity;
     }
-    // int id_beam = ((-this->HorzFOV() / 2 + i_beam * this->HorzFOV() / this->beamCount + M_PI)
-    //   / (2 * M_PI)) * (this->beamCount - 1);
-    int id_beam = i_beam;
+    int id_beam = static_cast<int>(((-this->HorzFOV() / 2 + i_beam * this->HorzFOV() / this->beamCount + this->HorzFOV() / 2)
+      / (this->HorzFOV())) * (this->beamCount));
+    // int id_beam = i_beam;
     for (size_t i = 0; i < this->binCount; ++i)
       _accumData[id_beam * this->binCount + i] = this->bins[i];
   }
@@ -597,7 +631,7 @@ void MSISonar::GenerateTransferTable(std::vector<int> &_transfer, double _angleD
       point.y = point.y * static_cast<float>(this->binCount / (this->sonarImage.rows * 0.5));
 
       double radius = sqrt(point.x * point.x + point.y * point.y);
-      double theta = atan2(-point.x, -point.y) - _angleDisplacement;
+      double theta = atan2(-point.x, - point.y) - _angleDisplacement;
 
       // pixels out the sonar image
       if (radius > this->binCount || !radius || theta < -this->HorzFOV() / 2 || theta > this->HorzFOV() / 2)
@@ -609,8 +643,8 @@ void MSISonar::GenerateTransferTable(std::vector<int> &_transfer, double _angleD
       else
       {
         this->sonarImageMask.at<uchar>(j, i) = 255;
-        int idBeam = static_cast<int>(((theta + _angleDisplacement + M_PI) / (2 * M_PI)) * (this->beamCount - 1));
-        _transfer.push_back(idBeam * this->binCount + static_cast<float>(radius));
+        int idBeam = static_cast<int>(((theta + this->HorzFOV() / 2) / (this->HorzFOV())) * (this->beamCount));
+        _transfer.push_back(idBeam * this->binCount + static_cast<int>(radius));
       }
     }
   }
