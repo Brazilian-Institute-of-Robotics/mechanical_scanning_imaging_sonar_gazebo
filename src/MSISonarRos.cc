@@ -49,6 +49,8 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   angleMax = gazebo::SDFTool::GetSDFElement<double>(_sdf, "angle_max");
   angleMin = gazebo::SDFTool::GetSDFElement<double>(_sdf, "angle_min");
 
+  checkMax = true;
+
   rotationAxis = static_cast<RotAxis>(gazebo::SDFTool::GetSDFElement<int>(_sdf, "axis_rotation"));
   angleInit = this->GetAngleFromPose(current->GetRelativePose());
   angleAct = angleInit;
@@ -117,10 +119,12 @@ void MSISonarRos::OnPreRender()
   this->sonar->PreRender(current->GetWorldCoGPose());
   current->SetRelativePose(prePose);
 
-  angDispl = angleInit - this->GetAngleFromPose(current->GetRelativePose());
+  current->SetRelativePose( prePose + math::Pose(0,0,0,0,0,-angleInit));
+  angDispl = this->GetAngleFromPose(current->GetRelativePose());
+  current->SetRelativePose(prePose);
   angleAct = this->GetAngleFromPose(current->GetRelativePose());
 
-  // gzwarn << "Angle Disp" << angDispl << std::endl;
+  // gzwarn << "Angle Disp" << angDispl << "check max " << checkMax << std::endl;
 
   this->sonar->GetSonarImage(angDispl);
 }
@@ -129,10 +133,16 @@ void MSISonarRos::OnPoseUpdate()
 {
   if(angleMax==angleMin)
     angularVelocity = angularVelocity;
-  else if(angleMax <= angDispl )
-    angularVelocity = std::abs(angularVelocity);
-  else if(angleMin >= angDispl)
-    angularVelocity = -std::abs(angularVelocity);
+  else if((angleMax <= angDispl) && checkMax )
+  {
+      angularVelocity = -angularVelocity;
+      checkMax = false;
+  }
+  else if((angleMin >= angDispl) && !checkMax )
+  {
+      angularVelocity = -angularVelocity;
+      checkMax = true;
+  }
 
   current->SetAngularVel(math::Vector3(0,0,angularVelocity));
 }

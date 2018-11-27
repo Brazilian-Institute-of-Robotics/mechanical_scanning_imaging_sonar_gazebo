@@ -145,6 +145,9 @@ private:
   // Sampling frequency
   double samplingFrequency;
 
+  // Check if we are up or down
+  double checkMax;
+
   // Timer to check the update frequency
   common::Timer updateTimer;
 
