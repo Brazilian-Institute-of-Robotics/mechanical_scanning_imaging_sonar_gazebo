@@ -8,7 +8,6 @@
 
 #include "gazebo/common/Events.hh"
 
-
 namespace gazebo
 {
 
@@ -17,15 +16,14 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   // Store the pointer to the model
   this->sensor = _parent;
 
-  this->updateConnection =  event::Events::ConnectRender(
-                              std::bind(&MSISonarRos::OnUpdate, this));
-  this->updatePostRender =  event::Events::ConnectPostRender(
-                              std::bind(&MSISonarRos::OnPostRender, this));
-  this->updatePreRender =  event::Events::ConnectPreRender(
-                             std::bind(&MSISonarRos::OnPreRender, this));
+  this->updateConnection = event::Events::ConnectRender(
+      std::bind(&MSISonarRos::OnUpdate, this));
+  this->updatePostRender = event::Events::ConnectPostRender(
+      std::bind(&MSISonarRos::OnPostRender, this));
+  this->updatePreRender = event::Events::ConnectPreRender(
+      std::bind(&MSISonarRos::OnPreRender, this));
   this->updatePose = event::Events::ConnectWorldUpdateEnd(
-                             std::bind(&MSISonarRos::OnPoseUpdate, this));
-
+      std::bind(&MSISonarRos::OnPoseUpdate, this));
 
   if (rendering::RenderEngine::Instance()->GetRenderPathType() ==
       rendering::RenderEngine::NONE)
@@ -76,7 +74,8 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   {
     gzwarn << "Got Scene" << std::endl;
     double hfov = M_PI / 2;
-    this->sonar = std::shared_ptr<rendering::MSISonar>(new rendering::MSISonar(this->sensor->Name(), this->scene, false));
+    this->sonar = std::shared_ptr<rendering::MSISonar>
+      (new rendering::MSISonar(this->sensor->Name(), this->scene, false));
     this->sonar->SetFarClip(100.0);
     this->sonar->Init();
     this->sonar->Load(_sdf);
@@ -110,24 +109,22 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
   }
 }
 
-
-
 void MSISonarRos::OnPreRender()
 {
   math::Pose prePose = current->GetRelativePose();
   gzwarn << "MathPose" << prePose << std::endl;
-  // current->SetRelativePose( prePose + math::Pose(0,0,0,this->localRotation.X(),this->localRotation.Y(),this->localRotation.Z()));
-  current->SetRelativePose( math::Pose(prePose.pos.x,prePose.pos.y,prePose.pos.z,
-    prePose.rot.GetRoll() + this->localRotation.X(),prePose.rot.GetPitch() + this->localRotation.Y(),prePose.rot.GetYaw() + this->localRotation.Z()));
+  current->SetRelativePose(math::Pose(prePose.pos.x, prePose.pos.y, prePose.pos.z,
+                                      prePose.rot.GetRoll() + this->localRotation.X(),
+                                      prePose.rot.GetPitch() + this->localRotation.Y(),
+                                      prePose.rot.GetYaw() + this->localRotation.Z()));
   this->sonar->PreRender(current->GetWorldCoGPose());
-   gzwarn << "After rotatin" << current->GetRelativePose() << std::endl;
+  gzwarn << "After rotatin" << current->GetRelativePose() << std::endl;
   current->SetRelativePose(prePose);
 
-  // current->SetRelativePose( prePose + math::Pose(0,0,0,0,0,-angleInit));
-  current->SetRelativePose( math::Pose(prePose.pos.x,prePose.pos.y,prePose.pos.z,
-    prePose.rot.GetRoll() - angleInit * (rotationAxis == RotAxis::X),
-    prePose.rot.GetPitch() - angleInit * (rotationAxis == RotAxis::Y),
-    prePose.rot.GetYaw() - angleInit * (rotationAxis == RotAxis::Z) ));
+  current->SetRelativePose(math::Pose(prePose.pos.x, prePose.pos.y, prePose.pos.z,
+                                      prePose.rot.GetRoll() - angleInit * (rotationAxis == RotAxis::X),
+                                      prePose.rot.GetPitch() - angleInit * (rotationAxis == RotAxis::Y),
+                                      prePose.rot.GetYaw() - angleInit * (rotationAxis == RotAxis::Z)));
   angDispl = this->GetAngleFromPose(current->GetRelativePose());
   current->SetRelativePose(prePose);
   angleAct = this->GetAngleFromPose(current->GetRelativePose());
@@ -139,20 +136,20 @@ void MSISonarRos::OnPreRender()
 
 void MSISonarRos::OnPoseUpdate()
 {
-  if(angleMax==angleMin)
+  if (angleMax == angleMin)
     angularVelocity = angularVelocity;
-  else if((angleMax <= angDispl) && checkMax )
+  else if ((angleMax <= angDispl) && checkMax)
   {
-      angularVelocity = -angularVelocity;
-      checkMax = false;
+    angularVelocity = -angularVelocity;
+    checkMax = false;
   }
-  else if((angleMin >= angDispl) && !checkMax )
+  else if ((angleMin >= angDispl) && !checkMax)
   {
-      angularVelocity = -angularVelocity;
-      checkMax = true;
+    angularVelocity = -angularVelocity;
+    checkMax = true;
   }
 
-  current->SetAngularVel(math::Vector3(0,0,angularVelocity));
+  current->SetAngularVel(math::Vector3(0, 0, angularVelocity));
 }
 
 void MSISonarRos::OnUpdate()
@@ -163,17 +160,17 @@ void MSISonarRos::OnUpdate()
   this->sonar->RenderImpl();
 }
 
-
 void MSISonarRos::OnPostRender()
 {
-  if(updateTimer.GetElapsed().Double() > 1/samplingFrequency)
+  if (updateTimer.GetElapsed().Double() > 1 / samplingFrequency)
   {
-    updateTimer.Start(); 
-    updateTimer = common::Timer(); updateTimer.Start(); 
+    updateTimer.Start();
+    updateTimer = common::Timer();
+    updateTimer.Start();
   }
   else
     return;
-  
+
   this->sonar->PostRender();
 
   // Publish sonar image
@@ -205,21 +202,18 @@ void MSISonarRos::OnPostRender()
 
 double MSISonarRos::GetAngleFromPose(math::Pose _pose)
 {
-  switch(rotationAxis)
+  switch (rotationAxis)
   {
-    case RotAxis::X:
-      return _pose.rot.GetRoll();
-    case RotAxis::Y:
-      return _pose.rot.GetPitch();
-    case RotAxis::Z:
-      return _pose.rot.GetYaw();
-    default:
-      gzerr << "This axis does not exists" << std::endl;
-      break;
+  case RotAxis::X:
+    return _pose.rot.GetRoll();
+  case RotAxis::Y:
+    return _pose.rot.GetPitch();
+  case RotAxis::Z:
+    return _pose.rot.GetYaw();
+  default:
+    gzerr << "This axis does not exists" << std::endl;
+    break;
   }
 }
 
 }  // namespace gazebo
-
-
-

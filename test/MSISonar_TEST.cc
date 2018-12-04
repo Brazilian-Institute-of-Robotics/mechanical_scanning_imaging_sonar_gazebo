@@ -204,8 +204,20 @@ TEST_F(Sonar_TEST, Create)
 
   std::stringstream newSonarSS;
   newSonarSS <<"<sdf version='1.6'>"
-      << "<plugin name='SonarVisual' filename='libfl_sonar_ros.so' >"
-      << "<horizontal_fov>1.57079632679</horizontal_fov>"
+      << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
+      << "<hfov>0.78539816339</hfov>"
+      << "<update_rate>100</update_rate>"
+      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<debug>0</debug>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angle_max>${120*pi/180}</angle_max>"
+      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<sonar_output>"
+      << "  <width>720</width>"
+      << "  <height>720</height>"
+      << "</sonar_output>"
       << "<vfov>1.3</vfov>"
       << "<bin_count>720</bin_count>"
       << "<beam_count>800</beam_count>"
@@ -277,8 +289,20 @@ TEST_F(Sonar_TEST, SphereDraw)
 
   std::stringstream newSonarSS;
   newSonarSS <<"<sdf version='1.6'>"
-      << "<plugin name='SonarVisual' filename='libfl_sonar_ros.so' >"
-      << "<horizontal_fov>1.1</horizontal_fov>"
+      << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
+      << "<hfov>0.78539816339</hfov>"
+      << "<update_rate>100</update_rate>"
+      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<debug>0</debug>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angle_max>${120*pi/180}</angle_max>"
+      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<sonar_output>"
+      << "  <width>720</width>"
+      << "  <height>720</height>"
+      << "</sonar_output>"
       << "<vfov>0.78539816339</vfov>"
       << "<bin_count>720</bin_count>"
       << "<beam_count>720</beam_count>"
@@ -317,7 +341,7 @@ TEST_F(Sonar_TEST, SphereDraw)
 
   flSonar->PreRender(sonarPose);
   flSonar->RenderImpl();
-  flSonar->GetSonarImage();
+  flSonar->GetSonarImage(0.0f);
   flSonar->PostRender();
 
   cv::Mat shaderOutput = flSonar->ShaderImage();
@@ -365,8 +389,20 @@ TEST_F(Sonar_TEST, ConeDraw)
 
   std::stringstream newSonarSS;
   newSonarSS <<"<sdf version='1.6'>"
-      << "<plugin name='SonarVisual' filename='libfl_sonar_ros.so' >"
-      << "<horizontal_fov>1.1</horizontal_fov>"
+      << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
+      << "<hfov>0.78539816339</hfov>"
+      << "<update_rate>100</update_rate>"
+      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<debug>0</debug>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angle_max>${120*pi/180}</angle_max>"
+      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<sonar_output>"
+      << "  <width>720</width>"
+      << "  <height>720</height>"
+      << "</sonar_output>"
       << "<vfov>0.78539816339</vfov>"
       << "<bin_count>720</bin_count>"
       << "<beam_count>720</beam_count>"
@@ -405,7 +441,7 @@ TEST_F(Sonar_TEST, ConeDraw)
 
   flSonar->PreRender(sonarPose);
   flSonar->RenderImpl();
-  flSonar->GetSonarImage();
+  flSonar->GetSonarImage(0.0f);
   flSonar->PostRender();
 
   cv::Mat shaderOutput = flSonar->ShaderImage();

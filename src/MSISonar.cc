@@ -37,15 +37,14 @@ namespace gazebo
 namespace rendering
 {
 
-
 //////////////////////////////////////////////////
 MSISonar::MSISonar(const std::string &_namePrefix, ScenePtr _scene,
-                 const bool _autoRender)
-  : Camera(_namePrefix, _scene, false),
-    imageWidth(0),
-    imageHeight(0),
-    binCount(0),
-    beamCount(0)
+                   const bool _autoRender)
+    : Camera(_namePrefix, _scene, false),
+      imageWidth(0),
+      imageHeight(0),
+      binCount(0),
+      beamCount(0)
 {
 }
 
@@ -53,7 +52,7 @@ MSISonar::MSISonar(const std::string &_namePrefix, ScenePtr _scene,
 MSISonar::~MSISonar()
 {
   Ogre::TextureManager::getSingleton().remove(
-    this->camTexture->getName());
+      this->camTexture->getName());
 }
 
 //////////////////////////////////////////////////
@@ -66,17 +65,15 @@ void MSISonar::Load(sdf::ElementPtr _sdf)
   this->SetVertFOV(_sdf->Get<double>("vfov"));
 
   this->SetHorzFOV(_sdf->Get<double>("hfov"));
-  
-  double aspectRatio = this->HorzFOV()/this->VertFOV();
+
+  double aspectRatio = this->HorzFOV() / this->VertFOV();
 
   Ogre::Radian fov_now(this->vfov);
   this->camera->setFOVy(fov_now);
   this->camera->setAspectRatio(aspectRatio);
   this->camera->setAutoAspectRatio(0);
 
-  this->SetHorzFOV(this->GetVertFOV()*aspectRatio);
-
-
+  this->SetHorzFOV(this->GetVertFOV() * aspectRatio);
 
   this->SetFarClip(gazebo::SDFTool::GetSDFElement<double>(_sdf, "far", "clip"));
   this->SetNearClip(gazebo::SDFTool::GetSDFElement<double>(_sdf, "near", "clip"));
@@ -95,9 +92,9 @@ void MSISonar::Load(sdf::ElementPtr _sdf)
   int sonarImageWidth = gazebo::SDFTool::GetSDFElement<double>(_sdf, "width", "sonar_output");
   int sonarImageHeight = gazebo::SDFTool::GetSDFElement<double>(_sdf, "height", "sonar_output");
 
-  this->sonarImage = cv::Mat::zeros( sonarImageWidth, sonarImageHeight, CV_32F);
-  this->sonarImageMask = cv::Mat::zeros( sonarImageWidth, sonarImageHeight,CV_8UC1);
-  
+  this->sonarImage = cv::Mat::zeros(sonarImageWidth, sonarImageHeight, CV_32F);
+  this->sonarImageMask = cv::Mat::zeros(sonarImageWidth, sonarImageHeight, CV_8UC1);
+
   this->sonarImage.setTo(0);
   this->sonarImageMask.setTo(0);
 }
@@ -124,13 +121,14 @@ void MSISonar::Fini()
 void MSISonar::CreateTexture(const std::string &_textureName)
 {
   camTexture = Ogre::TextureManager::getSingleton().createManual(
-                 "RttTex",
-                 Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                 Ogre::TEX_TYPE_2D,
-                 this->imageWidth, this->imageHeight,
-                 0,
-                 Ogre::PF_FLOAT32_RGB  ,
-                 Ogre::TU_RENDERTARGET).getPointer();
+                                                       "RttTex",
+                                                       Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                                       Ogre::TEX_TYPE_2D,
+                                                       this->imageWidth, this->imageHeight,
+                                                       0,
+                                                       Ogre::PF_FLOAT32_RGB,
+                                                       Ogre::TU_RENDERTARGET)
+                   .getPointer();
   this->camTarget = camTexture->getBuffer()->getRenderTarget();
   this->camTarget->addViewport(this->camera);
   this->camTarget->getViewport(0)->setClearEveryFrame(true);
@@ -141,8 +139,8 @@ void MSISonar::CreateTexture(const std::string &_textureName)
   this->camTarget->getViewport(0)->setVisibilityMask(GZ_VISIBILITY_ALL
     & ~(GZ_VISIBILITY_GUI | GZ_VISIBILITY_SELECTABLE));
 
-  this->camMaterial = (Ogre::Material*)(
-                        Ogre::MaterialManager::getSingleton().getByName("GazeboRosSonar/NormalDepthMap").get());
+  this->camMaterial = (Ogre::Material *)
+    (Ogre::MaterialManager::getSingleton().getByName("GazeboRosSonar/NormalDepthMap").get());
   this->camMaterial->load();
 
   {
@@ -157,7 +155,7 @@ void MSISonar::CreateTexture(const std::string &_textureName)
 }
 
 //////////////////////////////////////////////////
-void MSISonar::ImageTextureToCV(float _width, int _height, Ogre::Texture* _inTex)
+void MSISonar::ImageTextureToCV(float _width, int _height, Ogre::Texture *_inTex)
 {
   common::Timer firstPassTimer, secondPassTimer;
 
@@ -189,8 +187,8 @@ void MSISonar::PostRender()
 
 /////////////////////////////////////////////////
 void MSISonar::UpdateRenderTarget(Ogre::RenderTarget *_target,
-                                 Ogre::Material *_material, Ogre::Camera *_cam,
-                                 const bool _updateTex)
+                                  Ogre::Material *_material, Ogre::Camera *_cam,
+                                  const bool _updateTex)
 {
   Ogre::RenderSystem *renderSys;
   Ogre::Viewport *vp = NULL;
@@ -229,7 +227,7 @@ void MSISonar::UpdateRenderTarget(Ogre::RenderTarget *_target,
   if (pass->hasVertexProgram())
   {
     renderSys->bindGpuProgram(
-      pass->getVertexProgram()->_getBindingDelegate());
+        pass->getVertexProgram()->_getBindingDelegate());
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
@@ -243,7 +241,7 @@ void MSISonar::UpdateRenderTarget(Ogre::RenderTarget *_target,
   if (pass->hasFragmentProgram())
   {
     renderSys->bindGpuProgram(
-      pass->getFragmentProgram()->_getBindingDelegate());
+        pass->getFragmentProgram()->_getBindingDelegate());
 
 #if OGRE_VERSION_MAJOR == 1 && OGRE_VERSION_MINOR == 6
     renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
@@ -257,15 +255,15 @@ void MSISonar::UpdateRenderTarget(Ogre::RenderTarget *_target,
 
 /////////////////////////////////////////////////
 void MSISonar::notifyRenderSingleObject(Ogre::Renderable *_rend,
-                                       const Ogre::Pass* /*pass*/, const Ogre::AutoParamDataSource* /*source*/,
-                                       const Ogre::LightList* /*lights*/, bool /*supp*/)
+                                        const Ogre::Pass * /*pass*/, const Ogre::AutoParamDataSource * /*source*/,
+                                        const Ogre::LightList * /*lights*/, bool /*supp*/)
 {
   Ogre::Vector4 retro = Ogre::Vector4(1.0f, 0, 0, 0);
   try
   {
     retro = _rend->getCustomParameter(1);
   }
-  catch (Ogre::ItemIdentityException& e)
+  catch (Ogre::ItemIdentityException &e)
   {
     _rend->setCustomParameter(1, Ogre::Vector4(1.0f, 0, 0, 0));
   }
@@ -273,7 +271,7 @@ void MSISonar::notifyRenderSingleObject(Ogre::Renderable *_rend,
   Ogre::Pass *pass = this->camMaterial->getBestTechnique()->getPass(0);
 
   Ogre::RenderSystem *renderSys =
-    this->scene->OgreSceneManager()->getDestinationRenderSystem();
+      this->scene->OgreSceneManager()->getDestinationRenderSystem();
 
   Ogre::AutoParamDataSource autoParamDataSource;
 
@@ -298,14 +296,14 @@ void MSISonar::notifyRenderSingleObject(Ogre::Renderable *_rend,
   pass->getFragmentProgramParameters()->setNamedConstant("attenuationCoeff", 0.0f);
 
   renderSys->bindGpuProgram(
-    pass->getVertexProgram()->_getBindingDelegate());
+      pass->getVertexProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_VERTEX_PROGRAM,
                                       pass->getVertexProgramParameters(),
                                       Ogre::GPV_GLOBAL || Ogre::GPV_PER_OBJECT);
 
   renderSys->bindGpuProgram(
-    pass->getFragmentProgram()->_getBindingDelegate());
+      pass->getFragmentProgram()->_getBindingDelegate());
 
   renderSys->bindGpuProgramParameters(Ogre::GPT_FRAGMENT_PROGRAM,
                                       pass->getFragmentProgramParameters(),
@@ -320,7 +318,6 @@ void MSISonar::RenderImpl()
   firstPassTimer.Start();
 
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
-
 
   sceneMgr->_suppressRenderStateChanges(true);
   sceneMgr->addRenderObjectListener(this);
@@ -370,7 +367,6 @@ void MSISonar::SetHorzFOV(const double _hfov)
 {
   this->hfov = _hfov;
 }
-
 
 //////////////////////////////////////////////////
 double MSISonar::GetNearClip() const
@@ -491,11 +487,9 @@ bool MSISonar::SetProjectionType(const std::string &_type)
 {
   bool result = true;
 
-
   this->camera->setProjectionType(Ogre::PT_PERSPECTIVE);
   this->camera->setCustomProjectionMatrix(false);
   this->scene->SetShadowsEnabled(false);
-
 
   return result;
 }
@@ -503,10 +497,8 @@ bool MSISonar::SetProjectionType(const std::string &_type)
 //////////////////////////////////////////////////
 void MSISonar::PreRender(math::Pose _pose)
 {
-
-
   ignition::math::Pose3d poseIgnition(_pose.pos.x, _pose.pos.y, _pose.pos.z,
-    _pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
+                                      _pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
 
   this->SetWorldPose(poseIgnition);
 }
@@ -514,15 +506,6 @@ void MSISonar::PreRender(math::Pose _pose)
 //////////////////////////////////////////////////
 void MSISonar::GetSonarImage(double _angleDisplacement)
 {
-  // int sonarImageWidth = this->imageWidth;
-  // int sonarImageHeight = this->imageHeight;
-  
-  // this->sonarImage = cv::Mat::zeros( sonarImageWidth,sonarImageHeight, CV_32F);
-  // this->sonarImageMask = cv::Mat::zeros(sonarImageWidth, sonarImageHeight, CV_8UC1);
-  
-  // this->sonarImage.setTo(0);
-  // this->sonarImageMask.setTo(0);
-  
   this->ImageTextureToCV(this->imageWidth, this->imageHeight, this->camTexture);
 
   // this->DebugPrintImageChannelToFile("TesteBlue.dat", this->rawImage,0);
@@ -537,7 +520,6 @@ void MSISonar::GetSonarImage(double _angleDisplacement)
   std::vector<int> transferTable;
   transferTable.clear();
 
-
   this->GenerateTransferTable(transferTable, _angleDisplacement);
 
   // this->DebugPrintMatrixToFile<int>("Teste3.dat", transferTable);
@@ -551,8 +533,7 @@ void MSISonar::CvToSonarBin(std::vector<float> &_accumData)
   for (int i_beam = 0; i_beam < this->beamCount; i_beam++)
   {
     cv::Mat roi = this->rawImage(cv::Rect(i_beam * ceil(this->imageWidth / this->beamCount), 0,
-      ceil(this->imageWidth / this->beamCount), this->rawImage.rows));
-
+                                          ceil(this->imageWidth / this->beamCount), this->rawImage.rows));
 
     this->sonarBinsDepth.assign(this->binCount, 0);
 
@@ -560,7 +541,7 @@ void MSISonar::CvToSonarBin(std::vector<float> &_accumData)
     unsigned int height = roi.cols;
 
     // calculate depth histogram
-    float* ptr = reinterpret_cast<float*>(roi.data);
+    float *ptr = reinterpret_cast<float *>(roi.data);
     for (int i = 0; i < width * height; i++)
     {
       int xIndex = i / height;
@@ -579,9 +560,10 @@ void MSISonar::CvToSonarBin(std::vector<float> &_accumData)
       float intensity = (1.0 / this->sonarBinsDepth[bin_idx]) * this->Sigmoid(roi.at<cv::Vec3f>(xIndex, yIndex)[0]);
       this->bins[bin_idx] += intensity;
     }
-    int id_beam = static_cast<int>(((-this->HorzFOV() / 2 + i_beam * this->HorzFOV() / this->beamCount + this->HorzFOV() / 2)
+    int id_beam = static_cast<int>(((-this->HorzFOV() / 2 + i_beam * this->HorzFOV()
+      / this->beamCount + this->HorzFOV() / 2)
       / (this->HorzFOV())) * (this->beamCount));
-    // int id_beam = i_beam;
+
     for (size_t i = 0; i < this->binCount; ++i)
       _accumData[id_beam * this->binCount + i] = this->bins[i];
   }
@@ -604,7 +586,6 @@ void MSISonar::GenerateTransferTable(std::vector<int> &_transfer, double _angleD
   // set the origin
   cv::Point2f origin(this->sonarImage.cols / 2, this->sonarImage.rows / 2);
 
-
   for (size_t j = 0; j < this->sonarImage.rows; j++)
   {
     for (size_t i = 0; i < this->sonarImage.cols; i++)
@@ -615,7 +596,7 @@ void MSISonar::GenerateTransferTable(std::vector<int> &_transfer, double _angleD
       point.y = point.y * static_cast<float>(this->binCount / (this->sonarImage.rows * 0.5));
 
       double radius = sqrt(point.x * point.x + point.y * point.y);
-      double theta = atan2(-point.x, - point.y) - _angleDisplacement;
+      double theta = atan2(-point.x, -point.y) - _angleDisplacement;
 
       // pixels out the sonar image
       if (radius > this->binCount || !radius || theta < -this->HorzFOV() / 2 || theta > this->HorzFOV() / 2)
@@ -638,9 +619,9 @@ void MSISonar::GenerateTransferTable(std::vector<int> &_transfer, double _angleD
 template <typename T>
 void MSISonar::DebugPrintMatrixToFile(const std::string &_filename, const std::vector<T> &_matrix)
 {
-  FILE* imageFile;
+  FILE *imageFile;
   imageFile = fopen(_filename.c_str(), "w");
-  for (int i = 0 ; i < this->binCount + 1; i++)
+  for (int i = 0; i < this->binCount + 1; i++)
   {
     if (i == 0)
     {
@@ -667,9 +648,9 @@ void MSISonar::DebugPrintMatrixToFile(const std::string &_filename, const std::v
 //////////////////////////////////////////////////
 void MSISonar::DebugPrintImageToFile(const std::string &_filename, const cv::Mat &_image)
 {
-  FILE* imageFile;
+  FILE *imageFile;
   imageFile = fopen(_filename.c_str(), "w");
-  for (int i = 0 ; i < _image.cols * _image.rows ; i++)
+  for (int i = 0; i < _image.cols * _image.rows; i++)
   {
     fprintf(imageFile, "%u : %f %f %f\n", i, _image.at<cv::Vec3f>(i / _image.cols, i % _image.cols)[0],
             _image.at<cv::Vec3f>(i / _image.cols, i % _image.cols)[1],
@@ -681,9 +662,9 @@ void MSISonar::DebugPrintImageToFile(const std::string &_filename, const cv::Mat
 //////////////////////////////////////////////////
 void MSISonar::DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int &_channel)
 {
-  FILE* imageFile;
+  FILE *imageFile;
   imageFile = fopen(_filename.c_str(), "w");
-  for (int i = 0 ; i < _image.rows + 1; i++)
+  for (int i = 0; i < _image.rows + 1; i++)
   {
     if (i == 0)
     {
@@ -718,11 +699,10 @@ void MSISonar::PixelBoxTextureToCV(Ogre::Texture *_texture, cv::Mat &_image, int
 
   pixelBuffer = _texture->getBuffer();
   size_t size = Ogre::PixelUtil::getMemorySize(
-                  _width, _height, 1, Ogre::PF_FLOAT32_RGB);
-
+      _width, _height, 1, Ogre::PF_FLOAT32_RGB);
 
   Ogre::PixelBox dstBox(_width, _height,
-                        1, Ogre::PF_FLOAT32_RGB , _image.data);
+                        1, Ogre::PF_FLOAT32_RGB, _image.data);
 
   pixelBuffer->blitToMemory(dstBox);
 }

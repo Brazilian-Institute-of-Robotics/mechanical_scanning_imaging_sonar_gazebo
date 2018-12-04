@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>mechanical_scanning_imaging_sonar</name>
+  <name>mechanical_scanning_imaging_sonar_gazebo</name>
   <version>0.0.0</version>
   <description>Mechanica scanning Sonar Package based on ROCKY package</description>
 
