@@ -504,22 +504,6 @@ bool MSISonar::SetProjectionType(const std::string &_type)
 void MSISonar::PreRender(math::Pose _pose)
 {
 
-  // math::Quaternion localRotationQuaternion(this->LocalRotation().X(), this->LocalRotation().Y(), this->LocalRotation().Z());
-
-  
-
-  // // ignition::math::Pose3d poseIgnition(_pose.pos.x, _pose.pos.y, _pose.pos.z,
-  // //   _pose.rot.w + localRotationQuaternion.W(),
-  // //   _pose.rot.x + localRotationQuaternion.X(),
-  // //   _pose.rot.y + localRotationQuaternion.Y(),
-  // //   _pose.rot.z + localRotationQuaternion.Z());
-
-  // gzwarn << _pose.rot.x << " " << _pose.rot.y << "  " << _pose.rot.z << _pose.rot.w << std::endl;
-
-  // _pose.rot += localRotationQuaternion;
-
-
-  // gzwarn << _pose.rot.x << " " << _pose.rot.y << "  " << _pose.rot.z << _pose.rot.w << std::endl; 
 
   ignition::math::Pose3d poseIgnition(_pose.pos.x, _pose.pos.y, _pose.pos.z,
     _pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);

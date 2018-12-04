@@ -115,11 +115,19 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 void MSISonarRos::OnPreRender()
 {
   math::Pose prePose = current->GetRelativePose();
-  current->SetRelativePose( prePose + math::Pose(0,0,0,this->localRotation.X(),this->localRotation.Y(),this->localRotation.Z()));
+  gzwarn << "MathPose" << prePose << std::endl;
+  // current->SetRelativePose( prePose + math::Pose(0,0,0,this->localRotation.X(),this->localRotation.Y(),this->localRotation.Z()));
+  current->SetRelativePose( math::Pose(prePose.pos.x,prePose.pos.y,prePose.pos.z,
+    prePose.rot.GetRoll() + this->localRotation.X(),prePose.rot.GetPitch() + this->localRotation.Y(),prePose.rot.GetYaw() + this->localRotation.Z()));
   this->sonar->PreRender(current->GetWorldCoGPose());
+   gzwarn << "After rotatin" << current->GetRelativePose() << std::endl;
   current->SetRelativePose(prePose);
 
-  current->SetRelativePose( prePose + math::Pose(0,0,0,0,0,-angleInit));
+  // current->SetRelativePose( prePose + math::Pose(0,0,0,0,0,-angleInit));
+  current->SetRelativePose( math::Pose(prePose.pos.x,prePose.pos.y,prePose.pos.z,
+    prePose.rot.GetRoll() - angleInit * (rotationAxis == RotAxis::X),
+    prePose.rot.GetPitch() - angleInit * (rotationAxis == RotAxis::Y),
+    prePose.rot.GetYaw() - angleInit * (rotationAxis == RotAxis::Z) ));
   angDispl = this->GetAngleFromPose(current->GetRelativePose());
   current->SetRelativePose(prePose);
   angleAct = this->GetAngleFromPose(current->GetRelativePose());
