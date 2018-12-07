@@ -19,12 +19,20 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <cv_bridge/cv_bridge.h>
 
-// FLSonar Dependencies
-#include "foward_looking_gazebo_sonar/FLSonar.hh"
+// MSISonar Dependencies
+#include "mechanical_scanning_imaging_sonar_gazebo/MSISonar.hh"
 
 namespace gazebo
 {
-class FLSonarRos : public SensorPlugin
+
+enum RotAxis
+{
+  X = 0,
+  Y = 1,
+  Z = 2
+};
+
+class MSISonarRos : public SensorPlugin
 {
 public:
   /**
@@ -53,6 +61,12 @@ public:
    */
   void OnPostRender();
 
+  /**
+   * @brief Called for pose updating
+   *
+   */
+  void OnPoseUpdate();
+
 public:
   //// \brief Scene parent containing sensor
   rendering::ScenePtr scene;
@@ -67,7 +81,14 @@ public:
   physics::LinkPtr current;
 
   //// \brief sonar sensor where the link link is attached to
-  std::shared_ptr<gazebo::rendering::FLSonar> sonar;
+  std::shared_ptr<gazebo::rendering::MSISonar> sonar;
+
+protected:
+  /// \brief Get angle from pose
+  double GetAngleFromPose(math::Pose _pose);
+
+  /// \brief Local Rotation
+  ignition::math::Vector3d localRotation;
 
 private:
   // Pointer to the model
@@ -79,7 +100,11 @@ private:
   // Pointer to the update event connection
   event::ConnectionPtr updatePostRender;
 
+  // Pointer to the update event connection
   event::ConnectionPtr updatePreRender;
+
+  // Pointer to the update event connection
+  event::ConnectionPtr updatePose;
 
   // Ros node handle
   std::unique_ptr<ros::NodeHandle> rosNode;
@@ -96,10 +121,40 @@ private:
   // Image transport publisher for shader image
   image_transport::Publisher shaderImagePub;
 
+  // Rotational axis 1 -X 2 -Y 3 -Z
+  RotAxis rotationAxis;
+
+  // Initial angle
+  double angleInit;
+
+  // Actual angle
+  double angleAct;
+
+  // Delta rotion
+  double angDispl;
+
+  // Maximum angle
+  double angleMax;
+
+  // Minimum angle
+  double angleMin;
+
+  // Delta angular Velocity
+  double angularVelocity;
+
+  // Sampling frequency
+  double samplingFrequency;
+
+  // Check if we are up or down
+  double checkMax;
+
+  // Timer to check the update frequency
+  common::Timer updateTimer;
+
   // Debug flag
   bool bDebug;
 };
 
 // Register this plugin with the simulator
-GZ_REGISTER_SENSOR_PLUGIN(FLSonarRos)
+GZ_REGISTER_SENSOR_PLUGIN(MSISonarRos)
 }  // namespace gazebo

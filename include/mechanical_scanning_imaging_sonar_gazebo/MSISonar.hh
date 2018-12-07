@@ -43,7 +43,7 @@ namespace rendering
 
 /// \class Sonar Sonar.hh rendering/rendering.hh
 /// \brief GPU based laser distance sensor
-class GZ_RENDERING_VISIBLE FLSonar
+class GZ_RENDERING_VISIBLE MSISonar
   : public Camera, public Ogre::RenderObjectListener
 {
   /// \brief Constructor
@@ -51,12 +51,12 @@ class GZ_RENDERING_VISIBLE FLSonar
   /// \param[in] _scene Scene that will contain the camera
   /// \param[in] _autoRender Almost everyone should leave this as true.
 public:
-  FLSonar(const std::string &_namePrefix,
+  MSISonar(const std::string &_namePrefix,
           ScenePtr _scene, const bool _autoRender = true);
 
   /// \brief Destructor
 public:
-  virtual ~FLSonar();
+  virtual ~MSISonar();
 
   // Documentation inherited
 public:
@@ -92,21 +92,32 @@ public:
                                         const Ogre::LightList *_ll, bool _supp);
 
   /// \brief Get the vertical field-of-view.
-  /// \return The vertical field of view of the laser sensor.
+  /// \return The vertical field of view of the sonar sensor.
   /// \deprecated See VertFOV()
 public:
-  double GetVertFOV() const;
+  double GetVertFOV() const GAZEBO_DEPRECATED(8.0);
+
+  /// \brief Get the horizontal field-of-view.
+  /// \return The horizontal field of view of the sonar sensor.
+  /// \deprecated See HorzFOV()
+public:
+  double GetHorzFOV() const GAZEBO_DEPRECATED(8.0);
 
   /// \brief Get the vertical field-of-view.
-  /// \return The vertical field of view of the laser sensor.
+  /// \return The vertical field of view of the sonar sensor.
 public:
   double VertFOV() const;
+
+  /// \brief Get the horizontal field-of-view.
+  /// \return The horizontal field of view of the sonar sensor.
+public:
+  double HorzFOV() const;
 
   /// \brief Get near clip
   /// \return near clip distance
   /// \deprecated See NearClip()
 public:
-  double GetNearClip() const;
+  double GetNearClip() const GAZEBO_DEPRECATED(8.0);
 
   /// \brief Get near clip
   /// \return near clip distance
@@ -117,7 +128,7 @@ public:
   /// \return far clip distance
   /// \deprecated See FarClip()
 public:
-  double GetFarClip() const;
+  double GetFarClip() const GAZEBO_DEPRECATED(8.0);
 
   /// \brief Get far clip
   /// \return far clip distance
@@ -155,6 +166,11 @@ public:
 public:
   void SetVertFOV(const double _vfov);
 
+  /// \brief Set the horizontal fov
+  /// \param[in] _hfov horizontal fov
+public:
+  void SetHorzFOV(const double _hfov);
+
   // Documentation inherited.
 public:
   virtual void RenderImpl();
@@ -183,6 +199,21 @@ protected:
   void ImageTextureToCV(float _width, int _height, Ogre::Texture* _inTex);
 
   /**
+   * @brief Set Local Rotation
+   *
+   * @param _localRotation
+   */
+protected:
+  void SetLocalRotation(const ignition::math::Vector3d _localRotation);
+
+  /**
+   * @brief Getter Local Rotation
+   *
+   */
+public:
+  ignition::math::Vector3d LocalRotation();
+
+  /**
    * @brief Documentation Iherited
    *
    * @param _type
@@ -205,7 +236,7 @@ public:
    *
    */
 public:
-  void GetSonarImage();
+  void GetSonarImage(double angleDisplacement);
 
   /**
    * @brief Cv mat to sonar bin data
@@ -220,7 +251,7 @@ public:
    * @param _transfer Transfer vector that will be Generated
    */
 protected:
-  void GenerateTransferTable(std::vector<int> &_transfer);
+  void GenerateTransferTable(std::vector<int> &_transfer, double _angleDisplacement);
 
   /**
    * @brief Transfer the sonar bin data to cv::Mat sonarImage using transfer matrix
@@ -281,7 +312,7 @@ public:
    * @param _value
    */
 public:
-  void SetBinCount(const int &_value);
+  void SetBinCount(const int _value);
 
   /**
    * @brief Set the Beam Count object
@@ -289,7 +320,7 @@ public:
    * @param _value
    */
 public:
-  void SetBeamCount(const int &_value);
+  void SetBeamCount(const int _value);
 
   /**
    * @brief Set the Image Width object
@@ -297,7 +328,7 @@ public:
    * @param _value
    */
 public:
-  void SetImageWidth(const int &_value);
+  void SetImageWidth(const int _value);
 
   /**
    * @brief Set the Image Height object
@@ -305,7 +336,7 @@ public:
    * @param _value
    */
 public:
-  void SetImageHeight(const int &_value);
+  void SetImageHeight(const int _value);
 
 
   /**
@@ -320,6 +351,10 @@ protected:
   /// \brief Vertical field-of-view.
 protected:
   double vfov;
+
+  /// \brief Horizontal field-of-view.
+protected:
+  double hfov;
 
 
   /// \brief Near clip plane.
@@ -378,6 +413,10 @@ protected:
 protected:
   int beamCount;
 
+  //// \brief Local Rotation
+protected:
+  ignition::math::Vector3d localRotation;
+
   //// \brief Sonar image from ogre
   Ogre::Image imgSonar;
 
@@ -422,7 +461,7 @@ private:
    * @param _channel Channel selected
    */
 private:
-  void DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int &_channel);
+  void DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int _channel);
 };
 }  // namespace rendering
 }  // namespace gazebo

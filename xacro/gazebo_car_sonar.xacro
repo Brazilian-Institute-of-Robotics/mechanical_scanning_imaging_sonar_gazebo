@@ -2,24 +2,35 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 <gazebo reference="car_sonar/test_link">
 
-<sensor name='MSISSonar' type='camera'>
+<sensor name='MSISonar' type='camera'>
 
     <plugin name="SonarVisual" filename="libMechanicalScanningImagingSonarGazebo.so" >
-        <topic>car_sonar/MSISSonar</topic>
+        <update_rate>100</update_rate>
+        <local_rotation>0 ${1*pi/10} 0</local_rotation>
+        <topic>car_sonar/MSISonar</topic>
         <debug>1</debug>
+        <axis_rotation>2</axis_rotation>
+        <angle_max>${120*pi/180}</angle_max>
+        <angle_min>${-120*pi/180}</angle_min>
+        <axis_rotation>2</axis_rotation>
+        <angular_velocity>${0.5*pi/6}</angular_velocity>
         <link_reference>car_sonar/test_link</link_reference>
-        <horizontal_fov>${pi/2}</horizontal_fov>
-        <vfov>${pi/4}</vfov>
+        <hfov>${3*pi/180}</hfov>
+        <vfov>${35*pi/180}</vfov>
         <bin_count>720</bin_count>
-        <beam_count>720</beam_count>
+        <beam_count>1</beam_count>
         <image>
-            <width>720</width>
+            <width>180</width>
             <height>720</height>
             <format>R32G32B32</format>
         </image>
+        <sonar_output>
+            <width>720</width>
+            <height>720</height>
+        </sonar_output>
         <clip>
-            <near>0.1</near>
-            <far>5</far>
+            <near>3</near>
+            <far>10</far>
         </clip>
         <noise>
             <type>gaussian</type>
@@ -27,7 +38,7 @@
             <stddev>0.1</stddev>
         </noise>
     </plugin>  
-</sensor>  
+</sensor>
 
 </gazebo>
 

@@ -9,7 +9,7 @@
 #include "gazebo/test/ServerFixture.hh"
 #include "gazebo/common/MeshManager.hh"
 
-#include <mechanical_scanning_imaging_sonar_gazebo/FLSonar.hh>
+#include <mechanical_scanning_imaging_sonar_gazebo/MSISonar.hh>
 
 // OpenCV includes
 #include <opencv2/opencv.hpp>
@@ -204,8 +204,20 @@ TEST_F(Sonar_TEST, Create)
 
   std::stringstream newSonarSS;
   newSonarSS <<"<sdf version='1.6'>"
-      << "<plugin name='SonarVisual' filename='libfl_sonar_ros.so' >"
-      << "<horizontal_fov>1.57079632679</horizontal_fov>"
+      << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
+      << "<hfov>0.78539816339</hfov>"
+      << "<update_rate>100</update_rate>"
+      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<debug>0</debug>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angle_max>${120*pi/180}</angle_max>"
+      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<sonar_output>"
+      << "  <width>720</width>"
+      << "  <height>720</height>"
+      << "</sonar_output>"
       << "<vfov>1.3</vfov>"
       << "<bin_count>720</bin_count>"
       << "<beam_count>800</beam_count>"
@@ -221,15 +233,15 @@ TEST_F(Sonar_TEST, Create)
       << "</plugin>"
       << "</sdf>";
 
-  sdf::ElementPtr FLSonarSDF(new sdf::Element);
-  sdf::initFile("plugin.sdf", FLSonarSDF);
-  sdf::readString(newSonarSS.str(), FLSonarSDF);
+  sdf::ElementPtr MSISonarSDF(new sdf::Element);
+  sdf::initFile("plugin.sdf", MSISonarSDF);
+  sdf::readString(newSonarSS.str(), MSISonarSDF);
 
   gzwarn << PROJECT_SOURCE_PATH << std::endl;
 
-  rendering::FLSonar *flSonar = new rendering::FLSonar("test_sonar",scene,false);
+  rendering::MSISonar *flSonar = new rendering::MSISonar("test_sonar",scene,false);
   flSonar->Init();
-  flSonar->Load(FLSonarSDF);
+  flSonar->Load(MSISonarSDF);
 
   ASSERT_EQ(0.3,flSonar->GetFarClip());
   
@@ -277,8 +289,20 @@ TEST_F(Sonar_TEST, SphereDraw)
 
   std::stringstream newSonarSS;
   newSonarSS <<"<sdf version='1.6'>"
-      << "<plugin name='SonarVisual' filename='libfl_sonar_ros.so' >"
-      << "<horizontal_fov>1.1</horizontal_fov>"
+      << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
+      << "<hfov>0.78539816339</hfov>"
+      << "<update_rate>100</update_rate>"
+      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<debug>0</debug>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angle_max>${120*pi/180}</angle_max>"
+      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<sonar_output>"
+      << "  <width>720</width>"
+      << "  <height>720</height>"
+      << "</sonar_output>"
       << "<vfov>0.78539816339</vfov>"
       << "<bin_count>720</bin_count>"
       << "<beam_count>720</beam_count>"
@@ -294,13 +318,13 @@ TEST_F(Sonar_TEST, SphereDraw)
       << "</plugin>"
       << "</sdf>";
 
-  sdf::ElementPtr FLSonarSDF(new sdf::Element);
-  sdf::initFile("plugin.sdf", FLSonarSDF);
-  sdf::readString(newSonarSS.str(), FLSonarSDF);
+  sdf::ElementPtr MSISonarSDF(new sdf::Element);
+  sdf::initFile("plugin.sdf", MSISonarSDF);
+  sdf::readString(newSonarSS.str(), MSISonarSDF);
 
-  rendering::FLSonar *flSonar = new rendering::FLSonar("test_sonar",scene,false);
+  rendering::MSISonar *flSonar = new rendering::MSISonar("test_sonar",scene,false);
   flSonar->Init();
-  flSonar->Load(FLSonarSDF);
+  flSonar->Load(MSISonarSDF);
   gzwarn << "Image Width " << flSonar->ImageWidth() << std::endl;
   flSonar->CreateTexture("GPUTexture");
 
@@ -317,7 +341,7 @@ TEST_F(Sonar_TEST, SphereDraw)
 
   flSonar->PreRender(sonarPose);
   flSonar->RenderImpl();
-  flSonar->GetSonarImage();
+  flSonar->GetSonarImage(0.0f);
   flSonar->PostRender();
 
   cv::Mat shaderOutput = flSonar->ShaderImage();
@@ -365,8 +389,20 @@ TEST_F(Sonar_TEST, ConeDraw)
 
   std::stringstream newSonarSS;
   newSonarSS <<"<sdf version='1.6'>"
-      << "<plugin name='SonarVisual' filename='libfl_sonar_ros.so' >"
-      << "<horizontal_fov>1.1</horizontal_fov>"
+      << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
+      << "<hfov>0.78539816339</hfov>"
+      << "<update_rate>100</update_rate>"
+      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<debug>0</debug>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angle_max>${120*pi/180}</angle_max>"
+      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<axis_rotation>2</axis_rotation>"
+      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<sonar_output>"
+      << "  <width>720</width>"
+      << "  <height>720</height>"
+      << "</sonar_output>"
       << "<vfov>0.78539816339</vfov>"
       << "<bin_count>720</bin_count>"
       << "<beam_count>720</beam_count>"
@@ -382,13 +418,13 @@ TEST_F(Sonar_TEST, ConeDraw)
       << "</plugin>"
       << "</sdf>";
 
-  sdf::ElementPtr FLSonarSDF(new sdf::Element);
-  sdf::initFile("plugin.sdf", FLSonarSDF);
-  sdf::readString(newSonarSS.str(), FLSonarSDF);
+  sdf::ElementPtr MSISonarSDF(new sdf::Element);
+  sdf::initFile("plugin.sdf", MSISonarSDF);
+  sdf::readString(newSonarSS.str(), MSISonarSDF);
 
-  rendering::FLSonar *flSonar = new rendering::FLSonar("test_sonar",scene,false);
+  rendering::MSISonar *flSonar = new rendering::MSISonar("test_sonar",scene,false);
   flSonar->Init();
-  flSonar->Load(FLSonarSDF);
+  flSonar->Load(MSISonarSDF);
   gzwarn << "Image Width " << flSonar->ImageWidth() << std::endl;
   flSonar->CreateTexture("GPUTexture");
 
@@ -405,7 +441,7 @@ TEST_F(Sonar_TEST, ConeDraw)
 
   flSonar->PreRender(sonarPose);
   flSonar->RenderImpl();
-  flSonar->GetSonarImage();
+  flSonar->GetSonarImage(0.0f);
   flSonar->PostRender();
 
   cv::Mat shaderOutput = flSonar->ShaderImage();
