@@ -95,13 +95,13 @@ public:
   /// \return The vertical field of view of the sonar sensor.
   /// \deprecated See VertFOV()
 public:
-  double GetVertFOV() const;
+  double GetVertFOV() const GAZEBO_DEPRECATED(8.0);
 
   /// \brief Get the horizontal field-of-view.
   /// \return The horizontal field of view of the sonar sensor.
   /// \deprecated See HorzFOV()
 public:
-  double GetHorzFOV() const;
+  double GetHorzFOV() const GAZEBO_DEPRECATED(8.0);
 
   /// \brief Get the vertical field-of-view.
   /// \return The vertical field of view of the sonar sensor.
@@ -117,7 +117,7 @@ public:
   /// \return near clip distance
   /// \deprecated See NearClip()
 public:
-  double GetNearClip() const;
+  double GetNearClip() const GAZEBO_DEPRECATED(8.0);
 
   /// \brief Get near clip
   /// \return near clip distance
@@ -128,7 +128,7 @@ public:
   /// \return far clip distance
   /// \deprecated See FarClip()
 public:
-  double GetFarClip() const;
+  double GetFarClip() const GAZEBO_DEPRECATED(8.0);
 
   /// \brief Get far clip
   /// \return far clip distance
@@ -229,7 +229,7 @@ public:
    * @param _pose Set position of the camera
    */
 public:
-  void PreRender(math::Pose _pose);
+  void PreRender(const math::Pose &_pose);
 
   /**
    * @brief Get the Sonar Image to cartesian cv::Mat
@@ -312,7 +312,7 @@ public:
    * @param _value
    */
 public:
-  void SetBinCount(const int &_value);
+  void SetBinCount(const int _value);
 
   /**
    * @brief Set the Beam Count object
@@ -320,7 +320,7 @@ public:
    * @param _value
    */
 public:
-  void SetBeamCount(const int &_value);
+  void SetBeamCount(const int _value);
 
   /**
    * @brief Set the Image Width object
@@ -328,7 +328,7 @@ public:
    * @param _value
    */
 public:
-  void SetImageWidth(const int &_value);
+  void SetImageWidth(const int _value);
 
   /**
    * @brief Set the Image Height object
@@ -336,7 +336,7 @@ public:
    * @param _value
    */
 public:
-  void SetImageHeight(const int &_value);
+  void SetImageHeight(const int _value);
 
 
   /**
@@ -461,7 +461,7 @@ private:
    * @param _channel Channel selected
    */
 private:
-  void DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int &_channel);
+  void DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int _channel);
 };
 }  // namespace rendering
 }  // namespace gazebo

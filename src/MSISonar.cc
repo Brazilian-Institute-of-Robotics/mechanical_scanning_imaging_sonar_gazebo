@@ -263,7 +263,7 @@ void MSISonar::notifyRenderSingleObject(Ogre::Renderable *_rend,
   {
     retro = _rend->getCustomParameter(1);
   }
-  catch (Ogre::ItemIdentityException &e)
+  catch (const Ogre::ItemIdentityException &e)
   {
     _rend->setCustomParameter(1, Ogre::Vector4(1.0f, 0, 0, 0));
   }
@@ -459,25 +459,25 @@ cv::Mat MSISonar::SonarMask() const
 }
 
 //////////////////////////////////////////////////
-void MSISonar::SetImageWidth(const int &_value)
+void MSISonar::SetImageWidth(const int _value)
 {
   this->imageWidth = _value;
 }
 
 //////////////////////////////////////////////////
-void MSISonar::SetImageHeight(const int &_value)
+void MSISonar::SetImageHeight(const int _value)
 {
   this->imageHeight = _value;
 }
 
 //////////////////////////////////////////////////
-void MSISonar::SetBinCount(const int &_value)
+void MSISonar::SetBinCount(const int _value)
 {
   this->binCount = _value;
 }
 
 //////////////////////////////////////////////////
-void MSISonar::SetBeamCount(const int &_value)
+void MSISonar::SetBeamCount(const int _value)
 {
   this->beamCount = _value;
 }
@@ -495,7 +495,7 @@ bool MSISonar::SetProjectionType(const std::string &_type)
 }
 
 //////////////////////////////////////////////////
-void MSISonar::PreRender(math::Pose _pose)
+void MSISonar::PreRender(const math::Pose &_pose)
 {
   ignition::math::Pose3d poseIgnition(_pose.pos.x, _pose.pos.y, _pose.pos.z,
                                       _pose.rot.w, _pose.rot.x, _pose.rot.y, _pose.rot.z);
@@ -660,7 +660,7 @@ void MSISonar::DebugPrintImageToFile(const std::string &_filename, const cv::Mat
 }
 
 //////////////////////////////////////////////////
-void MSISonar::DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int &_channel)
+void MSISonar::DebugPrintImageChannelToFile(const std::string &_filename, const cv::Mat &_image, const int _channel)
 {
   FILE *imageFile;
   imageFile = fopen(_filename.c_str(), "w");
