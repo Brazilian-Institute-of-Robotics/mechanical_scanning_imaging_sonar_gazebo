@@ -15,6 +15,10 @@
 #include "gazebo/rendering/RenderTypes.hh"
 #include "gazebo/util/system.hh"
 
+#include "sonar_msgs/SonarStamped.h"
+
+#include <gazebo/physics/physics.hh>
+
 // OpenCV includes
 #include <opencv2/opencv.hpp>
 
@@ -205,6 +209,20 @@ protected:
    */
 protected:
   void SetLocalRotation(const ignition::math::Vector3d _localRotation);
+
+  /**
+   * @brief Get the Ros sonar msg
+   *
+   */
+public:
+  sonar_msgs::SonarStamped SonarRosMsg(const physics::WorldPtr _world, float _actAngle);
+
+  /**
+   * @brief Update the data for the sonar
+   *
+   */
+public:
+  void UpdateData();
 
   /**
    * @brief Getter Local Rotation
@@ -412,6 +430,14 @@ protected:
   //// \brief Number of beams
 protected:
   int beamCount;
+
+  //// \brief Data from sensor
+protected:
+  std::vector<float> accumData;
+
+  /// \brief Flag to check if the message was updated.
+private:
+  bool bUpdated;
 
   //// \brief Local Rotation
 protected:

@@ -93,6 +93,9 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 
   this->sonarImageTransport.reset(new image_transport::ImageTransport(*this->rosNode));
 
+  this->sonarMsgPub = this->rosNode->advertise<sonar_msgs::SonarStamped>(
+                                          _sdf->Get<std::string>("topic") + "/beams_fls", 0);
+
   GZ_ASSERT(std::strcmp(_sdf->Get<std::string>("topic").c_str(), ""), "Topic name is not set");
 
   this->sonarImagePub = this->sonarImageTransport->advertise(_sdf->Get<std::string>("topic"), 1);
@@ -112,13 +115,11 @@ void MSISonarRos::Load(sensors::SensorPtr _parent, sdf::ElementPtr _sdf)
 void MSISonarRos::OnPreRender()
 {
   math::Pose prePose = current->GetRelativePose();
-  gzwarn << "MathPose" << prePose << std::endl;
   current->SetRelativePose(math::Pose(prePose.pos.x, prePose.pos.y, prePose.pos.z,
                                       prePose.rot.GetRoll() + this->localRotation.X(),
                                       prePose.rot.GetPitch() + this->localRotation.Y(),
                                       prePose.rot.GetYaw() + this->localRotation.Z()));
   this->sonar->PreRender(current->GetWorldCoGPose());
-  gzwarn << "After rotatin" << current->GetRelativePose() << std::endl;
   current->SetRelativePose(prePose);
 
   current->SetRelativePose(math::Pose(prePose.pos.x, prePose.pos.y, prePose.pos.z,
@@ -186,6 +187,9 @@ void MSISonarRos::OnPostRender()
 
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", B).toImageMsg();
     this->sonarImagePub.publish(msg);
+
+    this->sonarMsgPub.publish(this->sonar->SonarRosMsg(this->world, angDispl));
+
   }
 
   // Publish shader image

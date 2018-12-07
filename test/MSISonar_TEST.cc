@@ -115,13 +115,13 @@ protected:
 
   void GetCVValuesSphere(cv::Mat &_image,cv::Mat &_mask)
   {
-    _image.at<cv::Vec3f>(371,490)[0] = 0.802247;
-    _image.at<cv::Vec3f>(371,490)[1] = 0.792752;
+    _image.at<cv::Vec3f>(371,490)[0] = 0.564056;
+    _image.at<cv::Vec3f>(371,490)[1] = 0.746238;
     _image.at<cv::Vec3f>(371,490)[2] = 0;
     _mask.at<uchar>(371,490) = 255;
 
-    _image.at<cv::Vec3f>(400,400)[0] = 0.964479;
-    _image.at<cv::Vec3f>(400,400)[1] = 0.825283;
+    _image.at<cv::Vec3f>(400,400)[0] = 0.946981;
+    _image.at<cv::Vec3f>(400,400)[1] = 0.821607;
     _image.at<cv::Vec3f>(400,400)[2] = 0;
     _mask.at<uchar>(400,400) = 255;
 
@@ -134,13 +134,13 @@ protected:
 
   void GetCVValuesCone(cv::Mat &_image,cv::Mat &_mask)
   {
-    _image.at<cv::Vec3f>(371,490)[0] = 0.625631;
-    _image.at<cv::Vec3f>(371,490)[1] = 0.842747;
+    _image.at<cv::Vec3f>(371,490)[0] = 0;
+    _image.at<cv::Vec3f>(371,490)[1] = 0;
     _image.at<cv::Vec3f>(371,490)[2] = 0;
     _mask.at<uchar>(371,490) = 255;
 
-    _image.at<cv::Vec3f>(400,400)[0] = 0.943624;
-    _image.at<cv::Vec3f>(400,400)[1] = 0.835141;
+    _image.at<cv::Vec3f>(400,400)[0] = 0.908717;
+    _image.at<cv::Vec3f>(400,400)[1] = 0.836009;
     _image.at<cv::Vec3f>(400,400)[2] = 0;
     _mask.at<uchar>(400,400) = 255;
 
@@ -207,13 +207,13 @@ TEST_F(Sonar_TEST, Create)
       << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
       << "<hfov>0.78539816339</hfov>"
       << "<update_rate>100</update_rate>"
-      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<local_rotation>0 0 0</local_rotation>"
       << "<debug>0</debug>"
       << "<axis_rotation>2</axis_rotation>"
-      << "<angle_max>${120*pi/180}</angle_max>"
-      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<angle_max>2.09439510239</angle_max>"
+      << "<angle_min>-2.09439510239</angle_min>"
       << "<axis_rotation>2</axis_rotation>"
-      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<angular_velocity>0</angular_velocity>"
       << "<sonar_output>"
       << "  <width>720</width>"
       << "  <height>720</height>"
@@ -292,13 +292,13 @@ TEST_F(Sonar_TEST, SphereDraw)
       << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
       << "<hfov>0.78539816339</hfov>"
       << "<update_rate>100</update_rate>"
-      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<local_rotation>0 0 0</local_rotation>"
       << "<debug>0</debug>"
       << "<axis_rotation>2</axis_rotation>"
-      << "<angle_max>${120*pi/180}</angle_max>"
-      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<angle_max>0</angle_max>"
+      << "<angle_min>0</angle_min>"
       << "<axis_rotation>2</axis_rotation>"
-      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<angular_velocity>0</angular_velocity>"
       << "<sonar_output>"
       << "  <width>720</width>"
       << "  <height>720</height>"
@@ -348,13 +348,15 @@ TEST_F(Sonar_TEST, SphereDraw)
   cv::Mat shaderMask = cv::Mat::zeros(shaderOutput.rows,shaderOutput.cols, CV_8UC1);
   cv::Mat shaderRef = cv::Mat::zeros(shaderOutput.rows,shaderOutput.cols, CV_32FC3);
 
+  // cv::imwrite("ShaderOutputSphere.png",shaderOutput);
+
   GetCVValuesSphere(shaderRef,shaderMask);
 
   ApplyMask(shaderOutput,shaderMask);
 
   cv::Mat B = cv::Mat::zeros(shaderOutput.rows, shaderOutput.cols, CV_8UC3);
   shaderOutput.convertTo(B,CV_8UC3,255);
-  cv::imwrite("teste2.png",B);
+  cv::imwrite("testeShphere.png",shaderOutput);
 
   ASSERT_TRUE(CompareImages(shaderOutput,shaderRef,5e-3));
 }
@@ -392,13 +394,13 @@ TEST_F(Sonar_TEST, ConeDraw)
       << "<plugin name='SonarVisual' filename='libMechanicalScanningImagingSonarGazebo.so' >"
       << "<hfov>0.78539816339</hfov>"
       << "<update_rate>100</update_rate>"
-      << "<local_rotation>0 ${0} 0</local_rotation>"
+      << "<local_rotation>0 0 0</local_rotation>"
       << "<debug>0</debug>"
       << "<axis_rotation>2</axis_rotation>"
-      << "<angle_max>${120*pi/180}</angle_max>"
-      << "<angle_min>${-120*pi/180}</angle_min>"
+      << "<angle_max>2.09439510239</angle_max>"
+      << "<angle_min>-2.09439510239</angle_min>"
       << "<axis_rotation>2</axis_rotation>"
-      << "<angular_velocity>${0*pi/6}</angular_velocity>"
+      << "<angular_velocity>0</angular_velocity>"
       << "<sonar_output>"
       << "  <width>720</width>"
       << "  <height>720</height>"
