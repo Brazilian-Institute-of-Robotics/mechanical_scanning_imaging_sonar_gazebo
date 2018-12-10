@@ -19,7 +19,6 @@
   <depend>gazebo</depend>
   <depend>gazebo_plugins</depend>
   <depend>cv_bridge</depend>
-  <depend>sonar_msgs</depend>
 
   <exec_depend>gazebo_ros</exec_depend>
   <exec_depend>opencv3</exec_depend>
