@@ -42,6 +42,8 @@ class Mesh;
 namespace rendering
 {
 
+typedef boost::shared_ptr<sonar_msgs::SonarStamped> SonarStampedPtr;
+
 /// \addtogroup gazebo_rendering Rendering
 /// \{
 
@@ -215,7 +217,7 @@ protected:
    *
    */
 public:
-  sonar_msgs::SonarStamped SonarRosMsg(const physics::WorldPtr _world, float _actAngle);
+  SonarStampedPtr SonarRosMsg(const physics::WorldPtr _world, float _actAngle);
 
   /**
    * @brief Update the data for the sonar

@@ -540,19 +540,19 @@ void MSISonar::GetSonarImage(double _angleDisplacement)
 }
 
 //////////////////////////////////////////////////
-sonar_msgs::SonarStamped MSISonar::SonarRosMsg(const gazebo::physics::WorldPtr _world, float _actAngle)
+SonarStampedPtr MSISonar::SonarRosMsg(const gazebo::physics::WorldPtr _world, float _actAngle)
 {
   this->UpdateData();
 
-  sonar_msgs::SonarStamped sonarOutput;
-  sonarOutput.header.stamp.sec = _world->GetSimTime().sec;
-  sonarOutput.header.stamp.nsec = _world->GetSimTime().nsec;
-  sonarOutput.num_bins = this->binCount;
-  sonarOutput.num_beams = this->beamCount;
-  sonarOutput.beams_width = this->HorzFOV();
-  sonarOutput.beam_height = this->VertFOV();
-  sonarOutput.bearings = _actAngle;
-  sonarOutput.data = this->accumData;
+  SonarStampedPtr sonarOutput = boost::shared_ptr<sonar_msgs::SonarStamped>(new sonar_msgs::SonarStamped);
+  sonarOutput->header.stamp.sec = _world->GetSimTime().sec;
+  sonarOutput->header.stamp.nsec = _world->GetSimTime().nsec;
+  sonarOutput->num_bins = this->binCount;
+  sonarOutput->num_beams = this->beamCount;
+  sonarOutput->beams_width = this->HorzFOV();
+  sonarOutput->beam_height = this->VertFOV();
+  sonarOutput->bearings = _actAngle;
+  sonarOutput->data = this->accumData;
 
   return sonarOutput;
 }
