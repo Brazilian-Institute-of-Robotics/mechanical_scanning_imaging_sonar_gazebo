@@ -44,7 +44,8 @@ MSISonar::MSISonar(const std::string &_namePrefix, ScenePtr _scene,
       imageWidth(0),
       imageHeight(0),
       binCount(0),
-      beamCount(0)
+      beamCount(0),
+      bUpdated(false)
 {
 }
 
@@ -317,6 +318,8 @@ void MSISonar::RenderImpl()
 
   firstPassTimer.Start();
 
+  this->bUpdated = false;
+
   Ogre::SceneManager *sceneMgr = this->scene->OgreSceneManager();
 
   sceneMgr->_suppressRenderStateChanges(true);
@@ -504,18 +507,27 @@ void MSISonar::PreRender(const math::Pose &_pose)
 }
 
 //////////////////////////////////////////////////
+void MSISonar::UpdateData()
+{
+  if (!this->bUpdated)
+  {
+    this->ImageTextureToCV(this->imageWidth, this->imageHeight, this->camTexture);
+    this->accumData.assign(this->binCount * this->beamCount, 0.0);
+    this->CvToSonarBin(this->accumData);
+    this->bUpdated = true;
+  }
+}
+
+//////////////////////////////////////////////////
 void MSISonar::GetSonarImage(double _angleDisplacement)
 {
-  this->ImageTextureToCV(this->imageWidth, this->imageHeight, this->camTexture);
 
   // this->DebugPrintImageChannelToFile("TesteBlue.dat", this->rawImage,0);
   // this->DebugPrintImageChannelToFile("TesteGreen.dat", this->rawImage,1);
 
-  std::vector<float> accumData;
-  accumData.assign(this->binCount * this->beamCount, 0.0);
-  this->CvToSonarBin(accumData);
+  this->UpdateData();
 
-  this->DebugPrintMatrixToFile<float>("Teste2.dat", accumData);
+  // this->DebugPrintMatrixToFile<float>("Teste2.dat", this->accumData);
 
   std::vector<int> transferTable;
   transferTable.clear();
@@ -524,7 +536,25 @@ void MSISonar::GetSonarImage(double _angleDisplacement)
 
   // this->DebugPrintMatrixToFile<int>("Teste3.dat", transferTable);
 
-  this->TransferTableToSonar(accumData, transferTable);
+  this->TransferTableToSonar(this->accumData, transferTable);
+}
+
+//////////////////////////////////////////////////
+SonarStampedPtr MSISonar::SonarRosMsg(const gazebo::physics::WorldPtr _world, float _actAngle)
+{
+  this->UpdateData();
+
+  SonarStampedPtr sonarOutput = boost::shared_ptr<sonar_msgs::SonarStamped>(new sonar_msgs::SonarStamped);
+  sonarOutput->header.stamp.sec = _world->GetSimTime().sec;
+  sonarOutput->header.stamp.nsec = _world->GetSimTime().nsec;
+  sonarOutput->num_bins = this->binCount;
+  sonarOutput->num_beams = this->beamCount;
+  sonarOutput->beams_width = this->HorzFOV();
+  sonarOutput->beam_height = this->VertFOV();
+  sonarOutput->bearings = _actAngle;
+  sonarOutput->data = this->accumData;
+
+  return sonarOutput;
 }
 
 //////////////////////////////////////////////////
