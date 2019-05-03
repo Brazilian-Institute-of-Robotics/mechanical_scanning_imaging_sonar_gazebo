@@ -121,7 +121,7 @@ private:
   // Image transport publisher for shader image
   image_transport::Publisher shaderImagePub;
 
-   // Sonar message pub
+  // Sonar message pub
   ros::Publisher sonarMsgPub;
 
   // Rotational axis 1 -X 2 -Y 3 -Z

@@ -521,7 +521,6 @@ void MSISonar::UpdateData()
 //////////////////////////////////////////////////
 void MSISonar::GetSonarImage(double _angleDisplacement)
 {
-
   // this->DebugPrintImageChannelToFile("TesteBlue.dat", this->rawImage,0);
   // this->DebugPrintImageChannelToFile("TesteGreen.dat", this->rawImage,1);
 
