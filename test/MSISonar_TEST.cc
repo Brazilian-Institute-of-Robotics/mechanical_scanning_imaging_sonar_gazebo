@@ -115,13 +115,13 @@ protected:
 
   void GetCVValuesSphere(cv::Mat &_image,cv::Mat &_mask)
   {
-    _image.at<cv::Vec3f>(371,490)[0] = 0.564056;
-    _image.at<cv::Vec3f>(371,490)[1] = 0.746238;
+    _image.at<cv::Vec3f>(371,490)[0] = 0.802247;
+    _image.at<cv::Vec3f>(371,490)[1] = 0.792752;
     _image.at<cv::Vec3f>(371,490)[2] = 0;
     _mask.at<uchar>(371,490) = 255;
 
-    _image.at<cv::Vec3f>(400,400)[0] = 0.946981;
-    _image.at<cv::Vec3f>(400,400)[1] = 0.821607;
+    _image.at<cv::Vec3f>(400,400)[0] = 0.964479;
+    _image.at<cv::Vec3f>(400,400)[1] = 0.825283;
     _image.at<cv::Vec3f>(400,400)[2] = 0;
     _mask.at<uchar>(400,400) = 255;
 
@@ -134,13 +134,13 @@ protected:
 
   void GetCVValuesCone(cv::Mat &_image,cv::Mat &_mask)
   {
-    _image.at<cv::Vec3f>(371,490)[0] = 0;
-    _image.at<cv::Vec3f>(371,490)[1] = 0;
+    _image.at<cv::Vec3f>(371,490)[0] = 0.625631;
+    _image.at<cv::Vec3f>(371,490)[1] = 0.842747;
     _image.at<cv::Vec3f>(371,490)[2] = 0;
     _mask.at<uchar>(371,490) = 255;
 
-    _image.at<cv::Vec3f>(400,400)[0] = 0.908717;
-    _image.at<cv::Vec3f>(400,400)[1] = 0.836009;
+    _image.at<cv::Vec3f>(400,400)[0] = 0.943624;
+    _image.at<cv::Vec3f>(400,400)[1] = 0.835141;
     _image.at<cv::Vec3f>(400,400)[2] = 0;
     _mask.at<uchar>(400,400) = 255;
 
@@ -162,9 +162,9 @@ protected:
         float diff2 = std::abs( _image1.at<cv::Vec3f>(i,j)[2] - _image2.at<cv::Vec3f>(i,j)[2]);
 
         if( diff0 > _tol || diff1 > _tol || diff2 > _tol){
-          gzwarn << _image1.at<cv::Vec3f>(i,j)[0] << " " << _image2.at<cv::Vec3f>(i,j)[0] << std::endl;
-          gzwarn << _image1.at<cv::Vec3f>(i,j)[1] << " " << _image2.at<cv::Vec3f>(i,j)[1] << std::endl;
-          gzwarn << _image1.at<cv::Vec3f>(i,j)[2] << " " << _image2.at<cv::Vec3f>(i,j)[2] << std::endl;
+          gzwarn << _image1.at<cv::Vec3f>(i,j)[0] << " " << _image2.at<cv::Vec3f>(i,j)[0] << " index i: " << i << "index j: " << j << std::endl;
+          gzwarn << _image1.at<cv::Vec3f>(i,j)[1] << " " << _image2.at<cv::Vec3f>(i,j)[1] << " index i: " << i << "index j: " << j << std::endl;
+          gzwarn << _image1.at<cv::Vec3f>(i,j)[2] << " " << _image2.at<cv::Vec3f>(i,j)[2] << " index i: " << i << "index j: " << j << std::endl;
           return false;}
       }
     }

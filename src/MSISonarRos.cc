@@ -121,7 +121,6 @@ void MSISonarRos::OnPreRender()
                                       prePose.rot.GetYaw() + this->localRotation.Z()));
   this->sonar->PreRender(current->GetWorldCoGPose());
   current->SetRelativePose(prePose);
-
   current->SetRelativePose(math::Pose(prePose.pos.x, prePose.pos.y, prePose.pos.z,
                                       prePose.rot.GetRoll() - angleInit * (rotationAxis == RotAxis::X),
                                       prePose.rot.GetPitch() - angleInit * (rotationAxis == RotAxis::Y),
@@ -189,7 +188,6 @@ void MSISonarRos::OnPostRender()
     this->sonarImagePub.publish(msg);
 
     this->sonarMsgPub.publish(this->sonar->SonarRosMsg(this->world, angDispl));
-
   }
 
   // Publish shader image
