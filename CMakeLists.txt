@@ -4,6 +4,7 @@ project(mechanical_scanning_imaging_sonar_gazebo)
 
 find_package(catkin REQUIRED COMPONENTS roslint
   image_transport 
+  cv_bridge
   roscpp 
   sensor_msgs
   sonar_msgs)
